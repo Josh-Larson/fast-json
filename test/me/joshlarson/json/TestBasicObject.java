@@ -24,13 +24,13 @@ public class TestBasicObject {
 		try (JSONInputStream in = new JSONInputStream(obj.toString())) {
 			out = in.readObject();
 		}
-		Assert.assertEquals(1234, (long) out.get("positive"));
-		Assert.assertEquals(-1234, (long) out.get("negative"));
-		Assert.assertEquals(10E10, (double) out.get("exponent"), 1E-5);
-		Assert.assertEquals(12.34, (double) out.get("decimal"), 1E-5);
-		Assert.assertEquals(0, (long) out.get("pos_infinity"));
-		Assert.assertEquals(0, (long) out.get("neg_infinity"));
-		Assert.assertEquals(0, (long) out.get("nan"));
+		Assert.assertEquals((Long) 1234L, (Long) out.get("positive"));
+		Assert.assertEquals((Long) (-1234L), (Long) out.get("negative"));
+		Assert.assertEquals((Double) 10E10, (Double) out.get("exponent"), 1E-5);
+		Assert.assertEquals((Double) 12.34, (Double) out.get("decimal"), 1E-5);
+		Assert.assertEquals((Long) 0L, (Long) out.get("pos_infinity"));
+		Assert.assertEquals((Long) 0L, (Long) out.get("neg_infinity"));
+		Assert.assertEquals((Long) 0L, (Long) out.get("nan"));
 	}
 	
 	@Test

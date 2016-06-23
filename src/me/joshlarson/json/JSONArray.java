@@ -10,7 +10,7 @@ public class JSONArray implements Iterable<Object> {
 	private final ArrayList<Object> array; // Specifically ArrayList for null value support
 	
 	public JSONArray() {
-		array = new ArrayList<>();
+		array = new ArrayList<Object>();
 	}
 	
 	/**
@@ -18,6 +18,23 @@ public class JSONArray implements Iterable<Object> {
 	 */
 	public int size() {
 		return array.size();
+	}
+	
+	/**
+	 * Clears the internal array of all elements
+	 */
+	public void clear() {
+		array.clear();
+	}
+	
+	/**
+	 * Removes the specified index from the array
+	 * @param index the index to remove
+	 */
+	public Object remove(int index) {
+		if (index < 0 || index >= array.size())
+			throw new IndexOutOfBoundsException("Specified index " + index + " is out of range! [0, "+size()+")");
+		return array.remove(index);
 	}
 	
 	/**

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 import me.joshlarson.json.JSONException;
@@ -46,10 +46,17 @@ public class BigFileTest {
 	
 	private static JSONObject createObject() {
 		JSONObject obj = new JSONObject();
-		byte [] bigData = new byte[190*1024*1024];
-		new Random().nextBytes(bigData);
-		obj.put("data", Base64.getEncoder().encodeToString(bigData));
+		obj.put("data", getLargeString());
 		return obj;
+	}
+	
+	private static String getLargeString() {
+		byte [] data = new byte[190*1024*1024];
+		Random r = new Random();
+		for (int i = 0; i < data.length; ++i) {
+			data[i] = (byte) ('a' + r.nextInt(26));
+		}
+		return new String(data, StandardCharsets.US_ASCII);
 	}
 	
 }

@@ -12,7 +12,7 @@ public class JSONObject {
 	private final Map<String, Object> attributes;
 	
 	public JSONObject() {
-		attributes = new LinkedHashMap<>();
+		attributes = new LinkedHashMap<String, Object>();
 	}
 	
 	/**
@@ -22,6 +22,24 @@ public class JSONObject {
 	 */
 	public int size() {
 		return attributes.size();
+	}
+	
+	/**
+	 * Clears the internal map of all key-value pairs
+	 */
+	public void clear() {
+		attributes.clear();
+	}
+	
+	/**
+	 * Removes the key-value pair from the map
+	 * @param key the key to remove
+	 */
+	public void remove(String key) {
+		if (key == null)
+			throw new NullPointerException("Key cannot be null!");
+		
+		attributes.remove(key);
 	}
 	
 	/**
