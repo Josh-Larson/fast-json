@@ -52,6 +52,30 @@ public class TestBasicObject {
 		testString(obj, out, "non_ascii");
 	}
 	
+	@Test
+	public void testOperations() {
+		JSONObject obj = new JSONObject();
+		Assert.assertFalse(obj.containsKey("test_key"));
+		Assert.assertNull(obj.get("test_key"));
+		Assert.assertEquals(0, obj.size());
+		obj.put("test_key", false);
+		Assert.assertTrue(obj.containsKey("test_key"));
+		Assert.assertEquals(false, obj.get("test_key"));
+		Assert.assertEquals(1, obj.size());
+		obj.remove("test_key");
+		Assert.assertFalse(obj.containsKey("test_key"));
+		Assert.assertNull(obj.get("test_key"));
+		Assert.assertEquals(0, obj.size());
+		obj.put("test_key", false);
+		Assert.assertTrue(obj.containsKey("test_key"));
+		Assert.assertEquals(false, obj.get("test_key"));
+		Assert.assertEquals(1, obj.size());
+		obj.clear();
+		Assert.assertFalse(obj.containsKey("test_key"));
+		Assert.assertNull(obj.get("test_key"));
+		Assert.assertEquals(0, obj.size());
+	}
+	
 	private void testString(JSONObject expected, JSONObject actual, String key) {
 		Assert.assertEquals(expected.get(key), actual.get(key));
 	}
