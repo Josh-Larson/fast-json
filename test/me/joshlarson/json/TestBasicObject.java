@@ -42,7 +42,6 @@ public class TestBasicObject {
 		obj.put("non_ascii", "Testing null, carriage and lines: \0..\r..\n..");
 		JSONObject out;
 		String str = obj.toString();
-		System.out.println(str);
 		Assert.assertTrue("String must be entirely ascii", isAscii(str));
 		try (JSONInputStream in = new JSONInputStream(str)) {
 			out = in.readObject();
