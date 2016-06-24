@@ -76,6 +76,31 @@ public class TestBasicObject {
 		Assert.assertEquals(0, obj.size());
 	}
 	
+	@Test
+	public void testGet() {
+		JSONObject obj = new JSONObject();
+		JSONObject subObj = new JSONObject();
+		JSONArray subArray = new JSONArray();
+		obj.put("object", subObj);
+		obj.put("array", subArray);
+		obj.put("int", 123);
+		obj.put("long", 123E15);
+		obj.put("float", 12.3f);
+		obj.put("double", 12.3);
+		obj.put("bool", true);
+		obj.put("str", "testing");
+		obj.putNull("null");
+		Assert.assertEquals(subObj, obj.getObject("object"));
+		Assert.assertEquals(subArray, obj.getArray("array"));
+		Assert.assertEquals(123, obj.getInt("int"));
+		Assert.assertEquals((long) 123E15, obj.getLong("long"));
+		Assert.assertEquals(12.3f, obj.getFloat("float"), 1E-5);
+		Assert.assertEquals(12.3, obj.getDouble("double"), 1E-5);
+		Assert.assertEquals(true, obj.getBoolean("bool"));
+		Assert.assertEquals("testing", obj.getString("str"));
+		Assert.assertNull(obj.get("null"));
+	}
+	
 	private void testString(JSONObject expected, JSONObject actual, String key) {
 		Assert.assertEquals(expected.get(key), actual.get(key));
 	}

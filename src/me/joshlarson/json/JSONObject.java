@@ -2,11 +2,18 @@ package me.joshlarson.json;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * This class contains key-value pairs where the key is a string and the value is one of the
+ * following types: JSONObject, JSONArray, Number, Boolean, String, or null
+ * 
+ * @author josh
+ */
 public class JSONObject {
 	
 	private final Map<String, Object> attributes;
@@ -33,6 +40,7 @@ public class JSONObject {
 	
 	/**
 	 * Removes the key-value pair from the map
+	 * 
 	 * @param key the key to remove
 	 */
 	public void remove(String key) {
@@ -139,6 +147,100 @@ public class JSONObject {
 			throw new NullPointerException("Key cannot be null!");
 		
 		return attributes.get(key);
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a JSONObject
+	 * internally
+	 * 
+	 * @param key the key for the map
+	 * @return the JSONObject associated with the specified key
+	 * @throws NullPointerException if the specified key is null
+	 * @throws InvalidClassException if the object is not a JSONObject
+	 */
+	public JSONObject getObject(String key) {
+		return (JSONObject) get(key);
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a JSONArray
+	 * internally
+	 * 
+	 * @param key the key for the map
+	 * @return the JSONArray associated with the specified key
+	 * @throws NullPointerException if the specified key is null
+	 * @throws InvalidClassException if the object is not a JSONArray
+	 */
+	public JSONArray getArray(String key) {
+		return (JSONArray) get(key);
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a int internally
+	 * 
+	 * @param key the key for the map
+	 * @return the int associated with the specified key
+	 * @throws NullPointerException if the specified key is null or if the value is null
+	 */
+	public int getInt(String key) {
+		return ((Number) get(key)).intValue();
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a long internally
+	 * 
+	 * @param key the key for the map
+	 * @return the long associated with the specified key
+	 * @throws NullPointerException if the specified key is null or if the value is null
+	 */
+	public long getLong(String key) {
+		return ((Number) get(key)).longValue();
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a float internally
+	 * 
+	 * @param key the key for the map
+	 * @return the float associated with the specified key
+	 * @throws NullPointerException if the specified key is null or if the value is null
+	 */
+	public float getFloat(String key) {
+		return ((Number) get(key)).floatValue();
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a double internally
+	 * 
+	 * @param key the key for the map
+	 * @return the double associated with the specified key
+	 * @throws NullPointerException if the specified key is null or if the value is null
+	 */
+	public double getDouble(String key) {
+		return ((Number) get(key)).doubleValue();
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a boolean internally
+	 * 
+	 * @param key the key for the map
+	 * @return the boolean associated with the specified key
+	 * @throws NullPointerException if the specified key is null or if the value is null
+	 * @throws InvalidClassException if the object is not a boolean
+	 */
+	public boolean getBoolean(String key) {
+		return (boolean) get(key);
+	}
+	
+	/**
+	 * Gets the value associated with the specified key. The value is casted to a String internally
+	 * 
+	 * @param key the key for the map
+	 * @return the String associated with the specified key
+	 * @throws NullPointerException if the specified key is null
+	 * @throws InvalidClassException if the object is not a String
+	 */
+	public String getString(String key) {
+		return (String) get(key);
 	}
 	
 	/**

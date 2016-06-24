@@ -37,41 +37,66 @@ public class TestBasicArray {
 	
 	@Test
 	public void testBasicStrings() throws IOException, JSONException {
-		JSONArray obj = new JSONArray();
-		obj.add("NoPunctuation");
-		obj.add(".!,?;:}{][@#$%^&*)(-_+='`~|/><");
-		obj.add("TestingQuote\"Does this work\\?");
-		obj.add("Testing null, carriage and lines: \0..\r..\n..");
+		JSONArray array = new JSONArray();
+		array.add("NoPunctuation");
+		array.add(".!,?;:}{][@#$%^&*)(-_+='`~|/><");
+		array.add("TestingQuote\"Does this work\\?");
+		array.add("Testing null, carriage and lines: \0..\r..\n..");
 		JSONArray out;
-		String str = obj.toString();
-		Assert.assertEquals(4, obj.size());
+		String str = array.toString();
+		Assert.assertEquals(4, array.size());
 		Assert.assertTrue("String must be entirely ascii", isAscii(str));
 		try (JSONInputStream in = new JSONInputStream(str)) {
 			out = in.readArray();
 		}
 		Assert.assertEquals(4, out.size());
 		for (int i = 0; i < 4; i++)
-			Assert.assertEquals(obj.get(i), out.get(i));
+			Assert.assertEquals(array.get(i), out.get(i));
 	}
 	
 	@Test
 	public void testOperations() {
-		JSONArray obj = new JSONArray();
-		Assert.assertEquals(0, obj.size());
-		obj.add(false);
-		Assert.assertTrue(obj.contains(false));
-		Assert.assertEquals(false, obj.get(0));
-		Assert.assertEquals(1, obj.size());
-		obj.remove(0);
-		Assert.assertFalse(obj.contains(false));
-		Assert.assertEquals(0, obj.size());
-		obj.add(false);
-		Assert.assertTrue(obj.contains(false));
-		Assert.assertEquals(false, obj.get(0));
-		Assert.assertEquals(1, obj.size());
-		obj.clear();
-		Assert.assertFalse(obj.contains(false));
-		Assert.assertEquals(0, obj.size());
+		JSONArray array = new JSONArray();
+		Assert.assertEquals(0, array.size());
+		array.add(false);
+		Assert.assertTrue(array.contains(false));
+		Assert.assertEquals(false, array.get(0));
+		Assert.assertEquals(1, array.size());
+		array.remove(0);
+		Assert.assertFalse(array.contains(false));
+		Assert.assertEquals(0, array.size());
+		array.add(false);
+		Assert.assertTrue(array.contains(false));
+		Assert.assertEquals(false, array.get(0));
+		Assert.assertEquals(1, array.size());
+		array.clear();
+		Assert.assertFalse(array.contains(false));
+		Assert.assertEquals(0, array.size());
+	}
+	
+	@Test
+	public void testGet() {
+		JSONArray array = new JSONArray();
+		JSONObject subObj = new JSONObject();
+		JSONArray subArray = new JSONArray();
+		array.add(subObj);
+		array.add(subArray);
+		array.add(123);
+		array.add(123E15);
+		array.add(12.3f);
+		array.add(12.3);
+		array.add(true);
+		array.add("testing");
+		array.addNull();
+		Assert.assertEquals(subObj, array.getObject(0));
+		Assert.assertEquals(subArray, array.getArray(1));
+		Assert.assertEquals(123, array.getInt(2));
+		Assert.assertEquals((long) 123E15, array.getLong(3));
+		Assert.assertEquals(12.3f, array.getFloat(4), 1E-5);
+		Assert.assertEquals(12.3, array.getDouble(5), 1E-5);
+		Assert.assertEquals(true, array.getBoolean(6));
+		Assert.assertEquals("testing", array.getString(7));
+		Assert.assertNull(array.get(8));
 	}
 	
 	private boolean isAscii(String str) {

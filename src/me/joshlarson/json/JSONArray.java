@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * This class contains a list of values, which can be one of the following types: JSONObject,
+ * JSONArray, Number, Boolean, String, or null
+ * 
+ * @author josh
+ */
 public class JSONArray implements Iterable<Object> {
 	
 	private final ArrayList<Object> array; // Specifically ArrayList for null value support
@@ -29,11 +35,12 @@ public class JSONArray implements Iterable<Object> {
 	
 	/**
 	 * Removes the specified index from the array
+	 * 
 	 * @param index the index to remove
 	 */
 	public Object remove(int index) {
 		if (index < 0 || index >= array.size())
-			throw new IndexOutOfBoundsException("Specified index " + index + " is out of range! [0, "+size()+")");
+			throw new IndexOutOfBoundsException("Specified index " + index + " is out of range! [0, " + size() + ")");
 		return array.remove(index);
 	}
 	
@@ -98,6 +105,102 @@ public class JSONArray implements Iterable<Object> {
 	 */
 	public Object get(int index) {
 		return array.get(index);
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a
+	 * JSONObject
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the object at the specified index
+	 * @throws ClassCastException if the object is not a JSONObject
+	 */
+	public JSONObject getObject(int index) {
+		return (JSONObject) get(index);
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a
+	 * JSONArray
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the array at the specified index
+	 * @throws ClassCastException if the object is not a JSONArray
+	 */
+	public JSONArray getArray(int index) {
+		return (JSONArray) get(index);
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a int
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the int at the specified index
+	 * @throws NullPointerException if the object is null
+	 */
+	public int getInt(int index) {
+		return ((Number) get(index)).intValue();
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a
+	 * long
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the long at the specified index
+	 * @throws NullPointerException if the object is null
+	 */
+	public long getLong(int index) {
+		return ((Number) get(index)).longValue();
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a
+	 * float
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the float at the specified index
+	 * @throws NullPointerException if the object is null
+	 */
+	public float getFloat(int index) {
+		return ((Number) get(index)).floatValue();
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a
+	 * double
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the double at the specified index
+	 * @throws NullPointerException if the object is null
+	 */
+	public double getDouble(int index) {
+		return ((Number) get(index)).doubleValue();
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a
+	 * boolean
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the boolean at the specified index
+	 * @throws NullPointerException if the object is null
+	 * @throws ClassCastException if the object is not a boolean
+	 */
+	public boolean getBoolean(int index) {
+		return (boolean) get(index);
+	}
+	
+	/**
+	 * Gets the object at the specified index from the array. The returned object is casted to a
+	 * String
+	 * 
+	 * @param index the index to retrieve over the interval [0, size())
+	 * @return the string at the specified index
+	 * @throws ClassCastException if the object is not a String
+	 */
+	public String getString(int index) {
+		return (String) get(index);
 	}
 	
 	/**
