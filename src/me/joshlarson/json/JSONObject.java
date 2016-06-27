@@ -3,9 +3,9 @@ package me.joshlarson.json;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -14,7 +14,7 @@ import java.util.Set;
  * 
  * @author josh
  */
-public class JSONObject {
+public class JSONObject implements Map<String, Object> {
 	
 	private final Map<String, Object> attributes;
 	
@@ -43,11 +43,69 @@ public class JSONObject {
 	 * 
 	 * @param key the key to remove
 	 */
-	public void remove(String key) {
+	public Object remove(String key) {
 		if (key == null)
 			throw new NullPointerException("Key cannot be null!");
 		
-		attributes.remove(key);
+		return attributes.remove(key);
+	}
+	
+	public boolean containsKey(Object key) {
+		return attributes.containsKey(key);
+	}
+	
+	public boolean containsValue(Object value) {
+		return attributes.containsValue(value);
+	}
+	
+	public Object get(Object key) {
+		return attributes.get(key);
+	}
+	
+	public boolean isEmpty() {
+		return attributes.isEmpty();
+	}
+	
+	public Object put(String key, Object value) {
+		if (value instanceof JSONObject || value instanceof JSONArray)
+			return attributes.put(key, value);
+		if (value instanceof Number || value instanceof Boolean)
+			return attributes.put(key, value);
+		if (value instanceof String)
+			return attributes.put(key, value);
+		if (value == null)
+			return attributes.put(key, null);
+		throw new IllegalArgumentException("Value must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
+	}
+	
+	public void putAll(Map<? extends String, ? extends Object> m) {
+		for (Entry<? extends String, ? extends Object> e : m.entrySet()) {
+			put(e.getKey(), e.getValue());
+		}
+	}
+	
+	public Object remove(Object key) {
+		return attributes.remove(key);
+	}
+	
+	public Set<Entry<String, Object>> entrySet() {
+		return attributes.entrySet();
+	}
+	
+	public Set<String> keySet() {
+		return attributes.keySet();
+	}
+	
+	public Collection<Object> values() {
+		return attributes.values();
+	}
+	
+	public boolean equals(Object o) {
+		return attributes.equals(o);
+	}
+	
+	public int hashCode() {
+		return attributes.hashCode();
 	}
 	
 	/**
@@ -241,48 +299,6 @@ public class JSONObject {
 	 */
 	public String getString(String key) {
 		return (String) get(key);
-	}
-	
-	/**
-	 * Determines whether or not the specified key exists within the map
-	 * 
-	 * @param key the key to check for
-	 * @return TRUE if the key exists, FALSE otherwise
-	 */
-	public boolean containsKey(String key) {
-		return attributes.containsKey(key);
-	}
-	
-	/**
-	 * Returns a {@link Set} view of the mappings contained in this map. The set is backed by the
-	 * map, so changes to the map are reflected in the set, and vice-versa. If the map is modified
-	 * while an iteration over the set is in progress (except through the iterator's own
-	 * <tt>remove</tt> operation, or through the <tt>setValue</tt> operation on a map entry returned
-	 * by the iterator) the results of the iteration are undefined. The set supports element
-	 * removal, which removes the corresponding mapping from the map, via the
-	 * <tt>Iterator.remove</tt>, <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt> and
-	 * <tt>clear</tt> operations. It does not support the <tt>add</tt> or <tt>addAll</tt>
-	 * operations.
-	 *
-	 * @return a set view of the mappings contained in this map
-	 */
-	public Set<Entry<String, Object>> entrySet() {
-		return attributes.entrySet();
-	}
-	
-	/**
-	 * Returns a {@link Set} view of the keys contained in this map. The set is backed by the map,
-	 * so changes to the map are reflected in the set, and vice-versa. If the map is modified while
-	 * an iteration over the set is in progress (except through the iterator's own <tt>remove</tt>
-	 * operation), the results of the iteration are undefined. The set supports element removal,
-	 * which removes the corresponding mapping from the map, via the <tt>Iterator.remove</tt>,
-	 * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations.
-	 * It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
-	 *
-	 * @return a set view of the keys contained in this map
-	 */
-	public Set<String> keySet() {
-		return attributes.keySet();
 	}
 	
 	/**

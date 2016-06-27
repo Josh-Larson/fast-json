@@ -3,7 +3,10 @@ package me.joshlarson.json;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * This class contains a list of values, which can be one of the following types: JSONObject,
@@ -11,7 +14,7 @@ import java.util.Iterator;
  * 
  * @author josh
  */
-public class JSONArray implements Iterable<Object> {
+public class JSONArray implements List<Object>, Iterable<Object> {
 	
 	private final ArrayList<Object> array; // Specifically ArrayList for null value support
 	
@@ -19,29 +22,124 @@ public class JSONArray implements Iterable<Object> {
 		array = new ArrayList<Object>();
 	}
 	
-	/**
-	 * @return the size of the array
-	 */
 	public int size() {
 		return array.size();
 	}
 	
-	/**
-	 * Clears the internal array of all elements
-	 */
 	public void clear() {
 		array.clear();
 	}
 	
-	/**
-	 * Removes the specified index from the array
-	 * 
-	 * @param index the index to remove
-	 */
 	public Object remove(int index) {
 		if (index < 0 || index >= array.size())
 			throw new IndexOutOfBoundsException("Specified index " + index + " is out of range! [0, " + size() + ")");
 		return array.remove(index);
+	}
+	
+	public void add(int index, Object o) {
+		if (o instanceof JSONObject || o instanceof JSONArray)
+			array.add(index, o);
+		else if (o instanceof Number || o instanceof Boolean)
+			array.add(index, o);
+		else if (o instanceof String)
+			array.add(index, o);
+		else if (o == null)
+			array.add(index, null);
+		else
+			throw new IllegalArgumentException("Object must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
+	}
+	
+	public boolean add(Object o) {
+		if (o instanceof JSONObject)
+			add((JSONObject) o);
+		else if (o instanceof JSONArray)
+			add((JSONArray) o);
+		else if (o instanceof Number)
+			add((Number) o);
+		else if (o instanceof Boolean)
+			add((Boolean) o);
+		else if (o instanceof String)
+			add((String) o);
+		else if (o == null)
+			addNull();
+		else
+			throw new IllegalArgumentException("Object must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
+		return true;
+	}
+	
+	public boolean addAll(Collection<? extends Object> c) {
+		ensureCapacity(size() + c.size());
+		for (Object o : c) {
+			add(o);
+		}
+		return true;
+	}
+	
+	public boolean addAll(int index, Collection<? extends Object> c) {
+		ensureCapacity(size() + c.size());
+		int i = index;
+		for (Object o : c) {
+			add(i++, o);
+		}
+		return true;
+	}
+	
+	public boolean containsAll(Collection<?> c) {
+		return array.containsAll(c);
+	}
+	
+	public void ensureCapacity(int minCapacity) {
+		array.ensureCapacity(minCapacity);
+	}
+	
+	public int indexOf(Object o) {
+		return array.indexOf(o);
+	}
+	
+	public boolean isEmpty() {
+		return array.isEmpty();
+	}
+	
+	public int lastIndexOf(Object o) {
+		return array.lastIndexOf(o);
+	}
+	
+	public boolean remove(Object o) {
+		return array.remove(o);
+	}
+	
+	public boolean removeAll(Collection<?> c) {
+		return array.removeAll(c);
+	}
+	
+	public boolean retainAll(Collection<?> c) {
+		return array.retainAll(c);
+	}
+	
+	public Object set(int index, Object element) {
+		return array.set(index, element);
+	}
+	
+	public List<Object> subList(int fromIndex, int toIndex) {
+		return array.subList(fromIndex, toIndex);
+	}
+	
+	public Object[] toArray() {
+		return array.toArray();
+	}
+	
+	public <T> T[] toArray(T[] a) {
+		return array.toArray(a);
+	}
+	
+	@Override
+	public ListIterator<Object> listIterator() {
+		return array.listIterator();
+	}
+	
+	@Override
+	public ListIterator<Object> listIterator(int index) {
+		return array.listIterator(index);
 	}
 	
 	/**
