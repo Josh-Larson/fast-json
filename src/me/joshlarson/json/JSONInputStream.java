@@ -195,7 +195,7 @@ public class JSONInputStream extends InputStream {
 					case '\\':
 						break;
 					default:
-						throw new JSONException("Unknown escaped character: " + c);
+						break;
 				}
 			}
 		}
@@ -236,7 +236,7 @@ public class JSONInputStream extends InputStream {
 		do {
 			c = readChar();
 		} while (isWhitespace(c));
-		return (char) c;
+		return c;
 	}
 	
 	public char peekChar() throws IOException {
@@ -271,26 +271,32 @@ public class JSONInputStream extends InputStream {
 		return buffer[bufferPos++];
 	}
 	
+	@Override
 	public int read(byte[] b) throws IOException {
 		return is.read(b);
 	}
 	
+	@Override
 	public int read(byte[] b, int off, int len) throws IOException {
 		return is.read(b, off, len);
 	}
 	
+	@Override
 	public long skip(long n) throws IOException {
 		return is.skip(n);
 	}
 	
+	@Override
 	public int available() throws IOException {
 		return is.available();
 	}
 	
+	@Override
 	public void close() throws IOException {
 		is.close();
 	}
 	
+	@Override
 	public void reset() throws IOException {
 		is.reset();
 	}
