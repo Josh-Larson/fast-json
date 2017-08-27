@@ -75,7 +75,9 @@ public class JSONOutputStream extends OutputStream {
 		for (String key : keys) {
 			if (!compact)
 				writeIndentation(depth + 1);
-			writeStringSafe("\"" + escapeString(key) + "\": ");
+			writeStringSafe("\"" + escapeString(key) + "\":");
+			if (!compact)
+				write(' ');
 			writeValue(obj.get(key), depth + 1);
 			if (i + 1 < keys.size())
 				write(',');
@@ -181,22 +183,27 @@ public class JSONOutputStream extends OutputStream {
 		return builder.toString();
 	}
 	
+	@Override
 	public void write(int b) throws IOException {
 		os.write(b);
 	}
 	
+	@Override
 	public void write(byte[] b) throws IOException {
 		os.write(b);
 	}
 	
+	@Override
 	public void write(byte[] b, int off, int len) throws IOException {
 		os.write(b, off, len);
 	}
 	
+	@Override
 	public void flush() throws IOException {
 		os.flush();
 	}
 	
+	@Override
 	public void close() throws IOException {
 		os.close();
 	}

@@ -22,20 +22,24 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 		array = new ArrayList<Object>();
 	}
 	
+	@Override
 	public int size() {
 		return array.size();
 	}
 	
+	@Override
 	public void clear() {
 		array.clear();
 	}
 	
+	@Override
 	public Object remove(int index) {
 		if (index < 0 || index >= array.size())
 			throw new IndexOutOfBoundsException("Specified index " + index + " is out of range! [0, " + size() + ")");
 		return array.remove(index);
 	}
 	
+	@Override
 	public void add(int index, Object o) {
 		if (o instanceof JSONObject || o instanceof JSONArray)
 			array.add(index, o);
@@ -49,6 +53,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 			throw new IllegalArgumentException("Object must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
 	}
 	
+	@Override
 	public boolean add(Object o) {
 		if (o instanceof JSONObject)
 			add((JSONObject) o);
@@ -67,6 +72,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 		return true;
 	}
 	
+	@Override
 	public boolean addAll(Collection<? extends Object> c) {
 		ensureCapacity(size() + c.size());
 		for (Object o : c) {
@@ -75,6 +81,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 		return true;
 	}
 	
+	@Override
 	public boolean addAll(int index, Collection<? extends Object> c) {
 		ensureCapacity(size() + c.size());
 		int i = index;
@@ -84,6 +91,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 		return true;
 	}
 	
+	@Override
 	public boolean containsAll(Collection<?> c) {
 		return array.containsAll(c);
 	}
@@ -92,42 +100,52 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 		array.ensureCapacity(minCapacity);
 	}
 	
+	@Override
 	public int indexOf(Object o) {
 		return array.indexOf(o);
 	}
 	
+	@Override
 	public boolean isEmpty() {
 		return array.isEmpty();
 	}
 	
+	@Override
 	public int lastIndexOf(Object o) {
 		return array.lastIndexOf(o);
 	}
 	
+	@Override
 	public boolean remove(Object o) {
 		return array.remove(o);
 	}
 	
+	@Override
 	public boolean removeAll(Collection<?> c) {
 		return array.removeAll(c);
 	}
 	
+	@Override
 	public boolean retainAll(Collection<?> c) {
 		return array.retainAll(c);
 	}
 	
+	@Override
 	public Object set(int index, Object element) {
 		return array.set(index, element);
 	}
 	
+	@Override
 	public List<Object> subList(int fromIndex, int toIndex) {
 		return array.subList(fromIndex, toIndex);
 	}
 	
+	@Override
 	public Object[] toArray() {
 		return array.toArray();
 	}
 	
+	@Override
 	public <T> T[] toArray(T[] a) {
 		return array.toArray(a);
 	}
@@ -201,6 +219,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	 * @param index the index to retrieve over the interval [0, size())
 	 * @return the object at the specified index
 	 */
+	@Override
 	public Object get(int index) {
 		return array.get(index);
 	}
@@ -307,6 +326,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	 * @param o the object to search for within the array
 	 * @return TRUE if the object exists, FALSE otherwise
 	 */
+	@Override
 	public boolean contains(Object o) {
 		return array.contains(o);
 	}
@@ -321,10 +341,11 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	 * 
 	 * @return a JSON string compatible with RFC 4627
 	 */
+	@Override
 	public String toString() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
-			new JSONOutputStream(baos).writeArray(this);
+		try (JSONOutputStream stream = new JSONOutputStream(baos)) {
+			stream.writeArray(this);
 		} catch (IOException e) {
 			return "Failed: " + e.getMessage();
 		}

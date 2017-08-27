@@ -27,6 +27,7 @@ public class JSONObject implements Map<String, Object> {
 	 * 
 	 * @return the number of key-value pairs in the map
 	 */
+	@Override
 	public int size() {
 		return attributes.size();
 	}
@@ -34,6 +35,7 @@ public class JSONObject implements Map<String, Object> {
 	/**
 	 * Clears the internal map of all key-value pairs
 	 */
+	@Override
 	public void clear() {
 		attributes.clear();
 	}
@@ -50,22 +52,27 @@ public class JSONObject implements Map<String, Object> {
 		return attributes.remove(key);
 	}
 	
+	@Override
 	public boolean containsKey(Object key) {
 		return attributes.containsKey(key);
 	}
 	
+	@Override
 	public boolean containsValue(Object value) {
 		return attributes.containsValue(value);
 	}
 	
+	@Override
 	public Object get(Object key) {
 		return attributes.get(key);
 	}
 	
+	@Override
 	public boolean isEmpty() {
 		return attributes.isEmpty();
 	}
 	
+	@Override
 	public Object put(String key, Object value) {
 		if (value instanceof JSONObject || value instanceof JSONArray)
 			return attributes.put(key, value);
@@ -78,32 +85,39 @@ public class JSONObject implements Map<String, Object> {
 		throw new IllegalArgumentException("Value must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
 	}
 	
+	@Override
 	public void putAll(Map<? extends String, ? extends Object> m) {
 		for (Entry<? extends String, ? extends Object> e : m.entrySet()) {
 			put(e.getKey(), e.getValue());
 		}
 	}
 	
+	@Override
 	public Object remove(Object key) {
 		return attributes.remove(key);
 	}
 	
+	@Override
 	public Set<Entry<String, Object>> entrySet() {
 		return attributes.entrySet();
 	}
 	
+	@Override
 	public Set<String> keySet() {
 		return attributes.keySet();
 	}
 	
+	@Override
 	public Collection<Object> values() {
 		return attributes.values();
 	}
 	
+	@Override
 	public boolean equals(Object o) {
 		return attributes.equals(o);
 	}
 	
+	@Override
 	public int hashCode() {
 		return attributes.hashCode();
 	}
@@ -306,10 +320,11 @@ public class JSONObject implements Map<String, Object> {
 	 * 
 	 * @return a JSON string compatible with RFC 4627
 	 */
+	@Override
 	public String toString() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
-			new JSONOutputStream(baos).writeObject(this);
+		try (JSONOutputStream stream = new JSONOutputStream(baos)) {
+			stream.writeObject(this);
 		} catch (IOException e) {
 			return "Failed: " + e.getMessage();
 		}
