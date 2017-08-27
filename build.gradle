@@ -1,0 +1,49 @@
+def version = "1.7"
+
+allprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src']
+		}
+	}
+	test {
+		java {
+			srcDirs = ['src', 'test']
+		}
+	}
+}
+
+dependencies {
+	testCompile 'junit:junit:4.12'
+}
+
+repositories {
+	jcenter();
+}
+
+jar {
+	baseName = 'fast-json-' + version
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	baseName = 'fast-json-' + version
+	appendix = 'sources'
+	from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	baseName = 'fast-json-' + version
+	appendix = 'javadoc'
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives sourcesJar
+	archives javadocJar
+}
