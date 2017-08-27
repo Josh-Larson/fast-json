@@ -2,7 +2,6 @@ package me.joshlarson.json;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InvalidClassException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -44,6 +43,7 @@ public class JSONObject implements Map<String, Object> {
 	 * Removes the key-value pair from the map
 	 * 
 	 * @param key the key to remove
+	 * @return the previous value for this key
 	 */
 	public Object remove(String key) {
 		if (key == null)
@@ -196,7 +196,6 @@ public class JSONObject implements Map<String, Object> {
 	 * Puts a null value into the map with the specified key
 	 * 
 	 * @param key the key for the map
-	 * @param value the value associated with the specified key
 	 * @throws NullPointerException if the specified key is null
 	 */
 	public void putNull(String key) {
@@ -228,7 +227,7 @@ public class JSONObject implements Map<String, Object> {
 	 * @param key the key for the map
 	 * @return the JSONObject associated with the specified key
 	 * @throws NullPointerException if the specified key is null
-	 * @throws InvalidClassException if the object is not a JSONObject
+	 * @throws ClassCastException if the object is not a JSONObject
 	 */
 	public JSONObject getObject(String key) {
 		return (JSONObject) get(key);
@@ -241,7 +240,7 @@ public class JSONObject implements Map<String, Object> {
 	 * @param key the key for the map
 	 * @return the JSONArray associated with the specified key
 	 * @throws NullPointerException if the specified key is null
-	 * @throws InvalidClassException if the object is not a JSONArray
+	 * @throws ClassCastException if the object is not a JSONArray
 	 */
 	public JSONArray getArray(String key) {
 		return (JSONArray) get(key);
@@ -297,7 +296,7 @@ public class JSONObject implements Map<String, Object> {
 	 * @param key the key for the map
 	 * @return the boolean associated with the specified key
 	 * @throws NullPointerException if the specified key is null or if the value is null
-	 * @throws InvalidClassException if the object is not a boolean
+	 * @throws ClassCastException if the object is not a boolean
 	 */
 	public boolean getBoolean(String key) {
 		return (boolean) get(key);
@@ -309,7 +308,7 @@ public class JSONObject implements Map<String, Object> {
 	 * @param key the key for the map
 	 * @return the String associated with the specified key
 	 * @throws NullPointerException if the specified key is null
-	 * @throws InvalidClassException if the object is not a String
+	 * @throws ClassCastException if the object is not a String
 	 */
 	public String getString(String key) {
 		return (String) get(key);
