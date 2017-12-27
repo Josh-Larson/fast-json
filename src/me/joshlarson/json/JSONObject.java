@@ -27,10 +27,7 @@ package me.joshlarson.json;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class contains key-value pairs where the key is a string and the value is one of the
@@ -43,7 +40,11 @@ public class JSONObject implements Map<String, Object> {
 	private final Map<String, Object> attributes;
 	
 	public JSONObject() {
-		attributes = new LinkedHashMap<String, Object>();
+		this(new HashMap<String, Object>());
+	}
+	
+	public JSONObject(Map<String, Object> map) {
+		this.attributes = map;
 	}
 	
 	/**
@@ -71,10 +72,7 @@ public class JSONObject implements Map<String, Object> {
 	 * @return the previous value for this key
 	 */
 	public Object remove(String key) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		return attributes.remove(key);
+		return attributes.remove(Objects.requireNonNull(key, "key"));
 	}
 	
 	@Override
@@ -99,15 +97,7 @@ public class JSONObject implements Map<String, Object> {
 	
 	@Override
 	public Object put(String key, Object value) {
-		if (value instanceof JSONObject || value instanceof JSONArray)
-			return attributes.put(key, value);
-		if (value instanceof Number || value instanceof Boolean)
-			return attributes.put(key, value);
-		if (value instanceof String)
-			return attributes.put(key, value);
-		if (value == null)
-			return attributes.put(key, null);
-		throw new IllegalArgumentException("Value must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
+		return attributes.put(key, value);
 	}
 	
 	@Override
@@ -148,89 +138,6 @@ public class JSONObject implements Map<String, Object> {
 	}
 	
 	/**
-	 * Puts a JSONObject into the map with the specified key
-	 * 
-	 * @param key the key for the map
-	 * @param value the value associated with the specified key
-	 * @throws NullPointerException if the specified key is null
-	 */
-	public void put(String key, JSONObject value) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		attributes.put(key, value);
-	}
-	
-	/**
-	 * Puts a JSONArray into the map with the specified key
-	 * 
-	 * @param key the key for the map
-	 * @param value the value associated with the specified key
-	 * @throws NullPointerException if the specified key is null
-	 */
-	public void put(String key, JSONArray value) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		attributes.put(key, value);
-	}
-	
-	/**
-	 * Puts a number into the map with the specified key
-	 * 
-	 * @param key the key for the map
-	 * @param value the value associated with the specified key
-	 * @throws NullPointerException if the specified key is null
-	 */
-	public void put(String key, Number value) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		attributes.put(key, value);
-	}
-	
-	/**
-	 * Puts a boolean into the map with the specified key
-	 * 
-	 * @param key the key for the map
-	 * @param value the value associated with the specified key
-	 * @throws NullPointerException if the specified key is null
-	 */
-	public void put(String key, Boolean value) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		attributes.put(key, value);
-	}
-	
-	/**
-	 * Puts a string into the map with the specified key
-	 * 
-	 * @param key the key for the map
-	 * @param value the value associated with the specified key
-	 * @throws NullPointerException if the specified key is null
-	 */
-	public void put(String key, String value) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		attributes.put(key, value);
-	}
-	
-	/**
-	 * Puts a null value into the map with the specified key
-	 * 
-	 * @param key the key for the map
-	 * @throws NullPointerException if the specified key is null
-	 */
-	public void putNull(String key) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		attributes.put(key, null);
-	}
-	
-	/**
 	 * Gets the value associated with the specified key. The value will always be a supported JSON
 	 * object: JSONObject, JSONArray, Number, Boolean, String, or null
 	 * 
@@ -239,10 +146,7 @@ public class JSONObject implements Map<String, Object> {
 	 * @throws NullPointerException if the specified key is null
 	 */
 	public Object get(String key) {
-		if (key == null)
-			throw new NullPointerException("Key cannot be null!");
-		
-		return attributes.get(key);
+		return attributes.get(Objects.requireNonNull(key, "key"));
 	}
 	
 	/**

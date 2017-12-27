@@ -77,9 +77,9 @@ public class SimpleJson {
 		array.add(true);
 		array.add(1234);
 		array.add("testing!");
-		array.addNull();
+		array.add(null);
 		obj.put("array", array);
-		obj.putNull("my_null");
+		obj.put("my_null", null);
 		return obj;
 	}
 	

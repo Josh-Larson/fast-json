@@ -1,5 +1,9 @@
 ## How to use it:
 
+
+<a href='https://bintray.com/josh-larson/fast-json/fast-json?source=watch' alt='Get automatic notifications about new "fast-json" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
+[![Download](https://api.bintray.com/packages/josh-larson/fast-json/fast-json/images/download.svg)](https://bintray.com/josh-larson/fast-json/fast-json/_latestVersion)
+
 #### Read:
 
 To read, there are several options. First is using the convenience class JSON:
@@ -51,4 +55,4 @@ try (JSONOutputStream out = new JSONOutputStream(new FileOutputStream(new File("
 #### Additional Note(s):
 
 * There is both a JSONObject and an JSONArray, both are compatible with the input and output streams.
-* JSON will automatically clean up stream resources
+* The class JSON will automatically clean up stream resources

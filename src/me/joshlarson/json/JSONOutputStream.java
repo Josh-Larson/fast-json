@@ -28,6 +28,7 @@ package me.joshlarson.json;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -56,7 +57,6 @@ public class JSONOutputStream extends OutputStream {
 	 * Sets the indentation for each additional tab. This is not used if compact is set to true
 	 * 
 	 * @param indentation the indentation for each tab
-	 * @see setCompact
 	 */
 	public void setIndentation(String indentation) {
 		this.indentation = indentation;
@@ -98,6 +98,7 @@ public class JSONOutputStream extends OutputStream {
 		int i = 0;
 		Set<String> keys = obj.keySet();
 		for (String key : keys) {
+			Objects.requireNonNull(key, "key");
 			if (!compact)
 				writeIndentation(depth + 1);
 			writeStringSafe("\"" + escapeString(key) + "\":");
@@ -147,6 +148,8 @@ public class JSONOutputStream extends OutputStream {
 			writeObject(((JSONObject) o), depth);
 		else if (o instanceof JSONArray)			// Array
 			writeArray(((JSONArray) o), depth);
+		else										// Invalid
+			throw new IllegalArgumentException("Invalid class written to JSONOutputStream: " + o);
 	}
 	
 	private void writeNumber(Number n) throws IOException {

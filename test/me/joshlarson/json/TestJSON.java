@@ -30,6 +30,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.EOFException;
+import java.io.IOException;
+
 @RunWith(JUnit4.class)
 public class TestJSON {
 	
@@ -39,7 +42,7 @@ public class TestJSON {
 		original.put("string", "test");
 		JSONObject read = JSON.readObject(original.toString(), true);
 		Assert.assertNotNull(read);
-		Assert.assertEquals(original.get("string"), read.get("string"));
+		Assert.assertEquals(original.getString("string"), read.getString("string"));
 	}
 	
 	@Test
@@ -48,7 +51,75 @@ public class TestJSON {
 		original.add("test");
 		JSONArray read = JSON.readArray(original.toString(), true);
 		Assert.assertNotNull(read);
-		Assert.assertEquals(original.get(0), read.get(0));
+		Assert.assertEquals(original.getString(0), read.get(0));
+	}
+	
+	@Test
+	public void testUnicodeRead() throws JSONException, IOException {
+		String str = "{\"key1\":\"\\u0041\"}";
+		JSONObject obj = JSON.readObject(str);
+		Assert.assertNotNull(obj);
+		Assert.assertEquals("A", obj.get("key1"));
+	}
+	
+	@Test
+	public void testReadObjectString() throws JSONException, IOException {
+		JSONObject obj;
+		String str;
+		str = "{\"key1\":\"value1\",key2:2}";
+		obj = JSON.readObject(str);
+		Assert.assertNotNull(obj);
+		Assert.assertEquals("value1", obj.getString("key1"));
+		Assert.assertEquals(2, obj.getInt("key2"));
+	}
+	
+	@Test
+	public void testReadArrayString() throws JSONException, IOException {
+		JSONArray array;
+		String str;
+		
+		str = "[\"key1\",\"value1\",1.5,2]";
+		array = JSON.readArray(str);
+		Assert.assertNotNull(array);
+		Assert.assertEquals("key1", array.getString(0));
+		Assert.assertEquals("value1", array.getString(1));
+		Assert.assertEquals(1.5, array.getDouble(2), 1E-7);
+		Assert.assertEquals(2, array.getLong(3));
+		
+		str = "[\"val1\",null,false,true,1.5,2]";
+		array = JSON.readArray(str);
+		Assert.assertNotNull(array);
+		Assert.assertEquals("val1", array.getString(0));
+		Assert.assertNull(array.get(1));
+		Assert.assertEquals(false, array.getBoolean(2));
+		Assert.assertEquals(true, array.getBoolean(3));
+		Assert.assertEquals(1.5, array.getDouble(4), 1E-7);
+		Assert.assertEquals(2, array.getLong(5));
+	}
+	
+	@Test(expected=EOFException.class)
+	public void testObjectReadError1() throws JSONException, IOException {
+		Assert.assertNull(JSON.readObject("{"));
+	}
+	
+	@Test(expected=EOFException.class)
+	public void testObjectReadError2() throws JSONException, IOException {
+		Assert.assertNull(JSON.readObject("{testing"));
+	}
+	
+	@Test(expected=EOFException.class)
+	public void testObjectReadError3() throws JSONException, IOException {
+		Assert.assertNull(JSON.readObject("{testing:"));
+	}
+	
+	@Test(expected=EOFException.class)
+	public void testObjectReadError4() throws JSONException, IOException {
+		Assert.assertNull(JSON.readObject("{testing:\"value\""));
+	}
+	
+	@Test(expected=EOFException.class)
+	public void testObjectReadError5() throws JSONException, IOException {
+		Assert.assertNull(JSON.readObject("{testing:\"value\","));
 	}
 	
 }

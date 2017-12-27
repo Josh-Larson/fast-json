@@ -59,70 +59,32 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	
 	@Override
 	public Object remove(int index) {
-		if (index < 0 || index >= array.size())
-			throw new IndexOutOfBoundsException("Specified index " + index + " is out of range! [0, " + size() + ")");
 		return array.remove(index);
 	}
 	
 	@Override
 	public void add(int index, Object o) {
-		if (o instanceof JSONObject || o instanceof JSONArray)
-			array.add(index, o);
-		else if (o instanceof Number || o instanceof Boolean)
-			array.add(index, o);
-		else if (o instanceof String)
-			array.add(index, o);
-		else if (o == null)
-			array.add(index, null);
-		else
-			throw new IllegalArgumentException("Object must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
+		array.add(index, o);
 	}
 	
 	@Override
 	public boolean add(Object o) {
-		if (o instanceof JSONObject)
-			add((JSONObject) o);
-		else if (o instanceof JSONArray)
-			add((JSONArray) o);
-		else if (o instanceof Number)
-			add((Number) o);
-		else if (o instanceof Boolean)
-			add((Boolean) o);
-		else if (o instanceof String)
-			add((String) o);
-		else if (o == null)
-			addNull();
-		else
-			throw new IllegalArgumentException("Object must be of type: JSONObject, JSONArray, Number, Boolean, String, or null!");
-		return true;
+		return array.add(o);
 	}
 	
 	@Override
 	public boolean addAll(Collection<? extends Object> c) {
-		ensureCapacity(size() + c.size());
-		for (Object o : c) {
-			add(o);
-		}
-		return true;
+		return array.addAll(c);
 	}
 	
 	@Override
 	public boolean addAll(int index, Collection<? extends Object> c) {
-		ensureCapacity(size() + c.size());
-		int i = index;
-		for (Object o : c) {
-			add(i++, o);
-		}
-		return true;
+		return array.addAll(index, c);
 	}
 	
 	@Override
 	public boolean containsAll(Collection<?> c) {
 		return array.containsAll(c);
-	}
-	
-	public void ensureCapacity(int minCapacity) {
-		array.ensureCapacity(minCapacity);
 	}
 	
 	@Override
@@ -183,58 +145,6 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	@Override
 	public ListIterator<Object> listIterator(int index) {
 		return array.listIterator(index);
-	}
-	
-	/**
-	 * Adds a JSONObject to the array
-	 * 
-	 * @param obj the JSONObject to add
-	 */
-	public void add(JSONObject obj) {
-		array.add(obj);
-	}
-	
-	/**
-	 * Adds a JSONArray to the array
-	 * 
-	 * @param array the JSONArray to add
-	 */
-	public void add(JSONArray array) {
-		this.array.add(array);
-	}
-	
-	/**
-	 * Adds a number to the array
-	 * 
-	 * @param n the number to add
-	 */
-	public void add(Number n) {
-		array.add(n);
-	}
-	
-	/**
-	 * Adds a boolean to the array
-	 * 
-	 * @param b the boolean to add
-	 */
-	public void add(Boolean b) {
-		array.add(b);
-	}
-	
-	/**
-	 * Adds a string to the array
-	 * 
-	 * @param str the string to add
-	 */
-	public void add(String str) {
-		array.add(str);
-	}
-	
-	/**
-	 * Adds a null value to the array
-	 */
-	public void addNull() {
-		array.add(null);
 	}
 	
 	/**
@@ -368,13 +278,13 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	 */
 	@Override
 	public String toString() {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try (JSONOutputStream stream = new JSONOutputStream(baos)) {
+		ByteArrayOutputStream str = new ByteArrayOutputStream();
+		try (JSONOutputStream stream = new JSONOutputStream(str)) {
 			stream.writeArray(this);
 		} catch (IOException e) {
 			return "Failed: " + e.getMessage();
 		}
-		return baos.toString();
+		return str.toString();
 	}
 	
 }

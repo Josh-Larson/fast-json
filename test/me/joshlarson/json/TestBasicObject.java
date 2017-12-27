@@ -51,8 +51,8 @@ public class TestBasicObject {
 		}
 		Assert.assertEquals(1234L, out.get("positive"));
 		Assert.assertEquals((-1234L), out.get("negative"));
-		Assert.assertEquals((Double) 10E10, (Double) out.get("exponent"), 1E-5);
-		Assert.assertEquals((Double) 12.34, (Double) out.get("decimal"), 1E-5);
+		Assert.assertEquals(10E10, (Double) out.get("exponent"), 1E-5);
+		Assert.assertEquals(12.34, (Double) out.get("decimal"), 1E-5);
 		Assert.assertEquals(0L, out.get("pos_infinity"));
 		Assert.assertEquals(0L, out.get("neg_infinity"));
 		Assert.assertEquals(0L, out.get("nan"));
@@ -114,7 +114,7 @@ public class TestBasicObject {
 		obj.put("double", 12.3);
 		obj.put("bool", true);
 		obj.put("str", "testing");
-		obj.putNull("null");
+		obj.put("null", null);
 		Assert.assertEquals(subObj, obj.getObject("object"));
 		Assert.assertEquals(subArray, obj.getArray("array"));
 		Assert.assertEquals(123, obj.getInt("int"));

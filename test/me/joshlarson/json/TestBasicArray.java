@@ -112,7 +112,7 @@ public class TestBasicArray {
 		array.add(12.3);
 		array.add(true);
 		array.add("testing");
-		array.addNull();
+		array.add(null);
 		Assert.assertEquals(subObj, array.getObject(0));
 		Assert.assertEquals(subArray, array.getArray(1));
 		Assert.assertEquals(123, array.getInt(2));
