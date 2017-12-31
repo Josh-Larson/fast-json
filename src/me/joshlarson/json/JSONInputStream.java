@@ -39,12 +39,43 @@ import java.nio.charset.StandardCharsets;
  */
 public class JSONInputStream extends InputStream {
 	
+	private static final boolean [] STRING_SEPARATORS = new boolean[256];
+	private static final boolean [] TOKEN_MATCHERS = new boolean[256];
+	private static final boolean [] WHITESPACE_MATCHERS = new boolean[256];
+	
+	static {
+		/*
+			case ' ':
+			case '\n':
+			case '\t':
+			case '\r':
+			case ',':
+			case ']':
+			case '}':
+		 */
+		STRING_SEPARATORS['\\'] = true;
+		STRING_SEPARATORS['\"'] = true;
+		
+		WHITESPACE_MATCHERS[' '] = true;
+		WHITESPACE_MATCHERS['\n'] = true;
+		WHITESPACE_MATCHERS['\t'] = true;
+		WHITESPACE_MATCHERS['\r'] = true;
+		
+		System.arraycopy(WHITESPACE_MATCHERS, 0, TOKEN_MATCHERS, 0, 256);
+		TOKEN_MATCHERS[','] = true;
+		TOKEN_MATCHERS[']'] = true;
+		TOKEN_MATCHERS['}'] = true;
+	}
+	
 	private final InputStream is;
 	private final byte[] buffer;
-	private final StringBuilder stringBuilder;
+	
 	private int bufferPos;
 	private int bufferSize;
-	private boolean previousTokenString;
+	
+	private char[] strData;
+	private int strLength;
+	private int strMaxLength;
 	
 	/**
 	 * Creates a new input stream around the specified string
@@ -62,17 +93,43 @@ public class JSONInputStream extends InputStream {
 	 */
 	public JSONInputStream(InputStream is) {
 		this.is = is;
-		this.buffer = new byte[4096];
-		this.stringBuilder = new StringBuilder();
+		this.buffer = new byte[1024*4];
 		this.bufferPos = 0;
 		this.bufferSize = 0;
-		this.previousTokenString = false;
+		
+		this.strData = new char[512];
+		this.strLength = 0;
+		this.strMaxLength = 512;
+	}
+	
+	/**
+	 * Reads a JSONObject or a JSONArray from the stream
+	 * 
+	 * @return the read JSONObject/JSONArray or null if it's the end of the stream
+	 * @throws IOException   if there is an exception within the input stream
+	 * @throws JSONException if there is a JSON parsing error
+	 */
+	public Object readNext() throws IOException, JSONException {
+		char c;
+		try {
+			c = ingestWhitespace();
+		} catch (EOFException e) {
+			return null;
+		}
+		switch (c) {
+			case '{':
+				return getNextObjectInternal();
+			case '[':
+				return getNextArrayInternal();
+			default:
+				throw new JSONException("Invalid start to object/array!");
+		}
 	}
 	
 	/**
 	 * Reads a JSONObject from the stream
 	 *
-	 * @return the read JSONObject
+	 * @return the read JSONObject, or null if it's the end of the stream
 	 * @throws IOException   if there is an exception within the input stream
 	 * @throws JSONException if there is a JSON parsing error
 	 */
@@ -89,7 +146,7 @@ public class JSONInputStream extends InputStream {
 	/**
 	 * Reads a JSONArray from the stream
 	 *
-	 * @return the read JSONArray
+	 * @return the read JSONArray or null if it's the end of the stream
 	 * @throws IOException   if there is an exception within the input stream
 	 * @throws JSONException if there is a JSON parsing error
 	 */
@@ -141,89 +198,221 @@ public class JSONInputStream extends InputStream {
 	private JSONObject getNextObjectInternal() throws IOException, JSONException {
 		JSONObject obj = new JSONObject();
 		
-		char separator;
 		String key;
 		do {
-			key = getNextToken();
+			if (ingestWhitespace() != '\"')
+				throw new JSONException("Keys must start with \"!");
+			key = getNextTokenString();
 			if (ingestWhitespace() != ':')
 				throw new JSONException("Attributes must be key-value pairs separated by ':'");
 			
 			obj.put(key, getNextInternal());
-			
-			separator = ingestWhitespace();
-			if (separator == '}')
-				return obj;
-			if (separator != ',')
-				throw new JSONException("Expected ',' or '}' after value!");
-		} while (true);
+		} while (ingestSeparator('}'));
+		return obj;
 	}
 	
 	private JSONArray getNextArrayInternal() throws IOException, JSONException {
 		JSONArray array = new JSONArray();
 		
-		char separator;
 		do {
 			array.add(getNextInternal());
-			
-			separator = ingestWhitespace();
-			if (separator == ']')
-				return array;
-			if (separator != ',')
-				throw new JSONException("Expected ',' or ']' after value!");
-		} while (true);
+		} while (ingestSeparator(']'));
+		return array;
 	}
 	
 	private Object getNextInternal() throws IOException, JSONException {
-		String token = getNextToken();
-		if (previousTokenString)
-			return token;
-		
-		switch (token) {
-			case "null":
-				return null;
-			case "false":
-				return false;
-			case "true":
-				return true;
-			case "[":
+		char c = ingestWhitespace();
+		switch (c) {
+			case '\"':
+				return getNextTokenString();
+			case '[':
 				return getNextArrayInternal();
-			case "{":
+			case '{':
 				return getNextObjectInternal();
 		}
 		
-		if (token.indexOf('.') != -1)
-			return Double.valueOf(token);
-		
-		return Long.valueOf(token);
+		strLength = 0;
+		stringAppend(c);
+		return getNextTokenOther();
 	}
 	
-	private String getNextToken() throws IOException {
-		char c = ingestWhitespace();
-		previousTokenString = false;
-		
-		stringBuilder.setLength(0);
-		if (c == '\"') {
-			c = readChar();
-			while (c != '\"') {
-				if (c == '\\')
-					c = handleEscape(readChar());
-				stringBuilder.append(c);
-				
-				c = readChar();
+	private String getNextTokenString() throws IOException {
+		int c, min;
+		int pos = bufferPos;
+		int size = bufferSize;
+		byte [] buf = buffer;
+		char [] str = strData;
+		int strLen = 0;
+		while (true) {
+			min = strMaxLength - strLen + pos;
+			if (size < min)
+				min = size;
+			while (pos < min) {
+				c = buf[pos++];
+				if (!STRING_SEPARATORS[c]) {
+					str[strLen++] = (char) c;
+					continue;
+				}
+				bufferPos = pos;
+				bufferSize = size;
+				strLength = strLen;
+				strData = str;
+				if (c == '\\') {
+					stringAppend(readEscape());
+					pos = bufferPos;
+					size = bufferSize;
+					strLen = strLength;
+					str = strData;
+					break;
+				} else if (c == '\"') {
+					return stringCreate();
+				}
+				throw new IllegalStateException("getNextTokenString()");
 			}
-			previousTokenString = true;
-		} else {
-			stringBuilder.append(c);
-			c = peekChar();
-			while (isTokenChar(c)) {
-				stringBuilder.append(readChar());
-				c = peekChar();
+			if (pos >= size) {
+				if ((size = is.read(buf)) <= 0)
+					throw new EOFException();
+				pos = 0;
+			}
+			if (strLen >= strMaxLength) {
+				strMaxLength *= 8;
+				char [] replacement = new char[strMaxLength];
+				System.arraycopy(str, 0, replacement, 0, strLen);
+				str = replacement;
 			}
 		}
-		return stringBuilder.toString();
 	}
 	
-	private char handleEscape(char c) throws IOException {
+	private Object getNextTokenOther() throws IOException, JSONException {
+		int c, min;
+		int pos = bufferPos;
+		int size = bufferSize;
+		byte [] buf = buffer;
+		char [] str = strData;
+		int strLen = strLength;
+		outer_loop:
+		while (true) {
+			min = strMaxLength - strLen + pos;
+			if (size < min)
+				min = size;
+			while (pos < min) {
+				c = buf[pos];
+				if (!TOKEN_MATCHERS[c]) {
+					str[strLen++] = (char) c;
+					pos++;
+					continue;
+				}
+				break outer_loop;
+			}
+			if (pos >= size) {
+				if ((size = is.read(buf)) <= 0)
+					throw new EOFException();
+				pos = 0;
+			}
+			if (strLen >= strMaxLength) {
+				strMaxLength *= 8;
+				char [] replacement = new char[strMaxLength];
+				System.arraycopy(str, 0, replacement, 0, strLen);
+				str = replacement;
+			}
+		}
+		strData = str;
+		strLength = strLen;
+		bufferPos = pos;
+		bufferSize = size;
+		
+		return parseToken();
+	}
+	
+	private Object parseToken() throws JSONException {
+		boolean decimal = false;
+		int len = strLength;
+		for (int i = 0; i < len; i++) {
+			switch (strData[i]) {
+				case '.':
+					decimal = true;
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+				case '-':
+				case '+':
+				case 'E':
+				case 'e':
+					break;
+				default:
+					if (stringEquals("null"))
+						return null;
+					if (stringEquals("false"))
+						return Boolean.FALSE;
+					if (stringEquals("true"))
+						return Boolean.TRUE;
+					
+					throw new JSONException("Invalid token: " + stringCreate());
+			}
+		}
+		
+		String ret = stringCreate();
+		if (decimal)
+			return Double.valueOf(ret);
+		return Long.valueOf(ret);
+		
+	}
+	
+	private boolean ingestSeparator(char endChar) throws IOException, JSONException {
+		int c;
+		int pos = bufferPos;
+		int size = bufferSize;
+		byte [] buf = buffer;
+		while (true) {
+			while (pos < size) {
+				c = buf[pos++];
+				if (WHITESPACE_MATCHERS[c]) {
+					continue;
+				}
+				bufferPos = pos;
+				bufferSize = size;
+				if (c == ',')
+					return true;
+				if (c == endChar)
+					return false;
+				throw new JSONException("Expected ',' or '"+endChar+"' after value!");
+			}
+			if ((size = is.read(buf)) <= 0)
+				throw new EOFException();
+			pos = 0;
+		}
+	}
+	
+	private char ingestWhitespace() throws IOException {
+		int c;
+		int pos = bufferPos;
+		int size = bufferSize;
+		byte [] buf = buffer;
+		while (true) {
+			while (pos < size) {
+				c = buf[pos++];
+				if (WHITESPACE_MATCHERS[c]) {
+					continue;
+				}
+				bufferPos = pos;
+				bufferSize = size;
+				return (char) c;
+			}
+			if ((size = is.read(buf)) <= 0)
+				throw new EOFException();
+			pos = 0;
+		}
+	}
+	
+	private char readEscape() throws IOException {
+		char c = readChar();
 		switch (c) {
 			case 'n':
 				return '\n';
@@ -233,57 +422,70 @@ public class JSONInputStream extends InputStream {
 				return '\t';
 			case 'b':
 				return '\b';
-			case 'u': {
-				char result = 0;
-				for (int i = 0; i < 4; i++) {
-					c = readChar();
-					if (c >= '0' && c <= '9')
-						c -= '0';
-					else if (c >= 'a' && c <= 'f')
-						c -= 'a' - 10;
-					else if (c >= 'A' && c <= 'F')
-						c -= 'A' - 10;
-					else
-						throw new NumberFormatException();
-					result |= c << ((3-i) * 4);
-				}
-				return result;
-			}
+			case 'u':
+				break;
 			default:
 				return c;
 		}
-	}
-	
-	private boolean isTokenChar(char c) {
-		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '.' || c == '-' || c == '+';
-	}
-	
-	private char ingestWhitespace() throws IOException {
-		char c;
-		do {
-			c = readChar();
-		} while (c == ' ' || c == '\n' || c == '\t' || c == '\r');
-		return c;
-	}
-	
-	private char peekChar() throws IOException {
-		if (bufferPos >= bufferSize) {
-			bufferSize = is.read(buffer);
-			bufferPos = 0;
-			if (bufferSize <= 0)
-				throw new EOFException();
+		
+		char result = 0;
+		for (int i = 0; i < 4; i++) {
+			result |= readHexCharacter() << ((3 - i) * 4);
 		}
-		return (char) buffer[bufferPos];
+		return result;
+	}
+	
+	private byte readHexCharacter() throws IOException {
+		char c = readChar();
+		if (c >= '0' && c <= '9')
+			return (byte) (c - '0');
+		else if (c >= 'a' && c <= 'f')
+			return (byte) (c - 'a' + 10);
+		else if (c >= 'A' && c <= 'F')
+			return (byte) (c - 'A' + 10);
+		
+		throw new NumberFormatException();
 	}
 	
 	private char readChar() throws IOException {
-		if (bufferPos >= bufferSize) {
-			bufferSize = is.read(buffer);
-			bufferPos = 0;
-			if (bufferSize <= 0)
+		int pos = bufferPos;
+		if (pos >= bufferSize) {
+			if ((bufferSize = is.read(buffer)) <= 0)
 				throw new EOFException();
+			pos = 0;
 		}
-		return (char) buffer[bufferPos++];
+		bufferPos = pos + 1;
+		return (char) buffer[pos];
+	}
+	
+	private void stringAppend(char c) {
+		int len = strLength;
+		int max = strMaxLength;
+		strData[len] = c;
+		len++;
+		strLength = len;
+		if (len < max)
+			return;
+		max *= 2;
+		char [] replacement = new char[max];
+		System.arraycopy(strData, 0, replacement, 0, len);
+		strData = replacement;
+		strMaxLength = max;
+	}
+	
+	private boolean stringEquals(String str) {
+		int len = str.length();
+		if (len != strLength)
+			return false;
+		for (int i = 0; i < len; ++i) {
+			if (strData[i] != str.charAt(i))
+				return false;
+		}
+		return true;
+	}
+	
+	private String stringCreate() {
+		return new String(strData, 0, strLength);
 	}
 	
 }

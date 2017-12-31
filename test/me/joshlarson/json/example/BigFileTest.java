@@ -25,11 +25,9 @@
  */
 package me.joshlarson.json.example;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Random;
 
 import me.joshlarson.json.JSONException;
@@ -39,49 +37,47 @@ import me.joshlarson.json.JSONOutputStream;
 
 public class BigFileTest {
 	
-	public static void main(String [] args) throws IOException, JSONException {
-		File file = File.createTempFile("BigFileJsonTest", ".txt");
-		file.deleteOnExit();
+	public static void main(String [] args) throws IOException, JSONException, InterruptedException {
+		byte [] bigArrayData = Files.readAllBytes(new File("testdata/json-bigarray.json").toPath());
+		byte [] bigStringData = Files.readAllBytes(new File("testdata/json-bigstring.json").toPath());
+		JSONObject obj;
+		long start, end;
 		
-		long start = System.nanoTime();
-		testOutputSpeed(file);
-		long end = System.nanoTime();
-		System.out.printf("Output: %.6fms%n", (end-start)/1E6);
+		System.out.println("Running...");
+		start = System.nanoTime();
+		obj = testInputSpeed(bigArrayData);
+		end = System.nanoTime();
+		System.out.printf("Input-bigarray:   %.6fms%n", (end-start)/1E6);
+		start = System.nanoTime();
+		testOutputSpeed(obj);
+		end = System.nanoTime();
+		System.out.printf("Output-bigarray:  %.6fms%n", (end-start)/1E6);
 		
 		start = System.nanoTime();
-		testInputSpeed(file);
+		obj = testInputSpeed(bigStringData);
 		end = System.nanoTime();
-		System.out.printf("Input:  %.6fms%n", (end-start)/1E6);
+		System.out.printf("Input-bigstring:  %.6fms%n", (end-start)/1E6);
+		start = System.nanoTime();
+		testOutputSpeed(obj);
+		end = System.nanoTime();
+		System.out.printf("Output-bigstring: %.6fms%n", (end-start)/1E6);
 	}
 	
-	private static void testOutputSpeed(File file) throws IOException {
-		JSONObject obj = createObject();
-		try (JSONOutputStream out = new JSONOutputStream(new FileOutputStream(file))) {
+	private static void testOutputSpeed(JSONObject obj) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (JSONOutputStream out = new JSONOutputStream(baos)) {
 			out.writeObject(obj);
 		}
 	}
 	
-	private static void testInputSpeed(File file) throws IOException, JSONException {
+	private static JSONObject testInputSpeed(byte [] data) throws IOException, JSONException {
+		JSONObject obj = null;
 		for (int i = 0; i < 10; ++i) {
-			try (JSONInputStream in = new JSONInputStream(new FileInputStream(file))) {
-				in.readObject();
+			try (JSONInputStream in = new JSONInputStream(new ByteArrayInputStream(data))) {
+				obj = in.readObject();
 			}
 		}
-	}
-	
-	private static JSONObject createObject() {
-		JSONObject obj = new JSONObject();
-		obj.put("data", getLargeString());
 		return obj;
-	}
-	
-	private static String getLargeString() {
-		byte [] data = new byte[190*1024*1024];
-		Random r = new Random();
-		for (int i = 0; i < data.length; ++i) {
-			data[i] = (byte) ('a' + r.nextInt(26));
-		}
-		return new String(data, StandardCharsets.US_ASCII);
 	}
 	
 }

@@ -44,7 +44,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	private final ArrayList<Object> array; // Specifically ArrayList for null value support
 	
 	public JSONArray() {
-		array = new ArrayList<Object>();
+		array = new ArrayList<>();
 	}
 	
 	@Override
@@ -73,12 +73,12 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	}
 	
 	@Override
-	public boolean addAll(Collection<? extends Object> c) {
+	public boolean addAll(Collection<?> c) {
 		return array.addAll(c);
 	}
 	
 	@Override
-	public boolean addAll(int index, Collection<? extends Object> c) {
+	public boolean addAll(int index, Collection<?> c) {
 		return array.addAll(index, c);
 	}
 	
@@ -255,12 +255,11 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 		return (String) get(index);
 	}
 	
-	/**
-	 * Determines whether or not the specified object exists inside this array
-	 * 
-	 * @param o the object to search for within the array
-	 * @return TRUE if the object exists, FALSE otherwise
-	 */
+	@Override
+	public boolean equals(Object o) {
+		return array.equals(o);
+	}
+	
 	@Override
 	public boolean contains(Object o) {
 		return array.contains(o);
@@ -278,8 +277,19 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	 */
 	@Override
 	public String toString() {
+		return toString(false);
+	}
+	
+	/**
+	 * Returns a JSON string (RFC 4627) containing this array
+	 * 
+	 * @param compact create the compact version of this array
+	 * @return a JSON string compatible with RFC 4627
+	 */
+	public String toString(boolean compact) {
 		ByteArrayOutputStream str = new ByteArrayOutputStream();
 		try (JSONOutputStream stream = new JSONOutputStream(str)) {
+			stream.setCompact(compact);
 			stream.writeArray(this);
 		} catch (IOException e) {
 			return "Failed: " + e.getMessage();

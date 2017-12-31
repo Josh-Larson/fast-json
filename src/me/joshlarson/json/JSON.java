@@ -25,24 +25,55 @@
  */
 package me.joshlarson.json;
 
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Provides convenience methods for stream operations that do automatic resource cleanup
- * 
+ *
  * @author josh
  */
 public class JSON {
 	
 	/**
-	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONObject. After
-	 * reading, the input streams are closed
-	 * 
-	 * @param is the input stream to read from
+	 * Opens a new JSONInputStream with the specified InputStream and reads either a JSONObject or a JSONArray based on the input stream. After
+	 * reading, the input stream is closed
+	 *
+	 * @param is         the input stream to read from
+	 * @param printError TRUE if exception stack traces should be printed, FALSE otherwise
+	 * @return the JSONObject read from the stream, or null if there was an exception
+	 */
+	public static Object readNext(InputStream is, boolean printError) {
+		try (JSONInputStream in = new JSONInputStream(is)) {
+			return in.readNext();
+		} catch (IOException | JSONException e) {
+			if (printError)
+				e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Opens a new JSONInputStream with the specified string and reads either a JSONObject or a JSONArray based on the string
+	 *
+	 * @param str        the string to read from
+	 * @param printError TRUE if exception stack traces should be printed, FALSE otherwise
+	 * @return the JSONObject read from the stream, or null if there was an exception
+	 */
+	public static Object readNext(String str, boolean printError) {
+		try (JSONInputStream in = new JSONInputStream(str)) {
+			return in.readNext();
+		} catch (IOException | JSONException e) {
+			if (printError)
+				e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONObject. After reading, the input stream is closed
+	 *
+	 * @param is         the input stream to read from
 	 * @param printError TRUE if exception stack traces should be printed, FALSE otherwise
 	 * @return the JSONObject read from the stream, or null if there was an exception
 	 */
@@ -57,54 +88,26 @@ public class JSON {
 	}
 	
 	/**
-	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONObject. After
-	 * reading, the input streams are closed
-	 * 
-	 * @param is the input stream to read from
-	 * @return the JSONObject read from the stream, or null if there was an exception
-	 */
-	public static JSONObject readObject(InputStream is) throws IOException, JSONException {
-		try (JSONInputStream in = new JSONInputStream(is)) {
-			return in.readObject();
-		}
-	}
-	
-	/**
 	 * Opens a new JSONInputStream with the specified string and reads a JSONObject
-	 * 
-	 * @param str the string to read from
+	 *
+	 * @param str        the string to read from
 	 * @param printError TRUE if exception stack traces should be printed, FALSE otherwise
 	 * @return the JSONObject read from the string, or null if there was an exception
 	 */
 	public static JSONObject readObject(String str, boolean printError) {
 		try (JSONInputStream in = new JSONInputStream(str)) {
 			return in.readObject();
-		} catch (EOFException | JSONException e) {
+		} catch (IOException | JSONException e) {
 			if (printError)
 				e.printStackTrace();
-		} catch (IOException e) {
-			// Suppress - IOException shouldn't be possible
 		}
 		return null;
 	}
 	
 	/**
-	 * Opens a new JSONInputStream with the specified string and reads a JSONObject
-	 * 
-	 * @param str the string to read from
-	 * @return the JSONObject read from the string, or null if there was an exception
-	 */
-	public static JSONObject readObject(String str) throws IOException, JSONException {
-		try (JSONInputStream in = new JSONInputStream(str)) {
-			return in.readObject();
-		}
-	}
-	
-	/**
-	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONArray. After
-	 * reading, the input stream is closed
-	 * 
-	 * @param is the input stream to read from
+	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONArray. After reading, the input stream is closed
+	 *
+	 * @param is         the input stream to read from
 	 * @param printError TRUE if exception stack traces should be printed, FALSE otherwise
 	 * @return the JSONArray read from the stream, or null if there was an exception
 	 */
@@ -119,22 +122,9 @@ public class JSON {
 	}
 	
 	/**
-	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONArray. After
-	 * reading, the input stream is closed
-	 * 
-	 * @param is the input stream to read from
-	 * @return the JSONArray read from the stream
-	 */
-	public static JSONArray readArray(InputStream is) throws IOException, JSONException {
-		try (JSONInputStream in = new JSONInputStream(is)) {
-			return in.readArray();
-		}
-	}
-	
-	/**
 	 * Opens a new JSONInputStream with the specified string and reads a JSONArray
-	 * 
-	 * @param str the string to read from
+	 *
+	 * @param str        the string to read from
 	 * @param printError TRUE if exception stack traces should be printed, FALSE otherwise
 	 * @return the JSONArray read from the string, or null if there was an exception
 	 */
@@ -149,10 +139,82 @@ public class JSON {
 	}
 	
 	/**
+	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONObject or JSONArray. After reading, the input stream is closed
+	 *
+	 * @param is the input stream to read from
+	 * @return the JSONObject or JSONArray read from the stream, or null if there was an exception
+	 * @throws IOException   if there is an exception within the input stream
+	 * @throws JSONException if there is a JSON parsing error
+	 */
+	public static Object readNext(InputStream is) throws IOException, JSONException {
+		try (JSONInputStream in = new JSONInputStream(is)) {
+			return in.readNext();
+		}
+	}
+	
+	/**
+	 * Opens a new JSONInputStream with the specified string and reads a JSONObject
+	 *
+	 * @param str the string to read from
+	 * @return the JSONObject or JSONArray read from the stream
+	 * @throws IOException   if there is an exception within the input stream
+	 * @throws JSONException if there is a JSON parsing error
+	 */
+	public static Object readNext(String str) throws IOException, JSONException {
+		try (JSONInputStream in = new JSONInputStream(str)) {
+			return in.readNext();
+		}
+	}
+	
+	/**
+	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONObject. After reading, the input stream is closed
+	 *
+	 * @param is the input stream to read from
+	 * @return the JSONObject read from the stream, or null if there was an exception
+	 * @throws IOException   if there is an exception within the input stream
+	 * @throws JSONException if there is a JSON parsing error
+	 */
+	public static JSONObject readObject(InputStream is) throws IOException, JSONException {
+		try (JSONInputStream in = new JSONInputStream(is)) {
+			return in.readObject();
+		}
+	}
+	
+	/**
+	 * Opens a new JSONInputStream with the specified string and reads a JSONObject
+	 *
+	 * @param str the string to read from
+	 * @return the JSONObject read from the string, or null if there was an exception
+	 * @throws IOException   if there is an exception within the input stream
+	 * @throws JSONException if there is a JSON parsing error
+	 */
+	public static JSONObject readObject(String str) throws IOException, JSONException {
+		try (JSONInputStream in = new JSONInputStream(str)) {
+			return in.readObject();
+		}
+	}
+	
+	/**
+	 * Opens a new JSONInputStream with the specified InputStream and reads a JSONArray. After reading, the input stream is closed
+	 *
+	 * @param is the input stream to read from
+	 * @return the JSONArray read from the stream
+	 * @throws IOException   if there is an exception within the input stream
+	 * @throws JSONException if there is a JSON parsing error
+	 */
+	public static JSONArray readArray(InputStream is) throws IOException, JSONException {
+		try (JSONInputStream in = new JSONInputStream(is)) {
+			return in.readArray();
+		}
+	}
+	
+	/**
 	 * Opens a new JSONInputStream with the specified string and reads a JSONArray
-	 * 
+	 *
 	 * @param str the string to read from
 	 * @return the JSONArray read from the string
+	 * @throws IOException   if there is an exception within the input stream
+	 * @throws JSONException if there is a JSON parsing error
 	 */
 	public static JSONArray readArray(String str) throws IOException, JSONException {
 		try (JSONInputStream in = new JSONInputStream(str)) {

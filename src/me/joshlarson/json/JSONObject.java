@@ -101,8 +101,8 @@ public class JSONObject implements Map<String, Object> {
 	}
 	
 	@Override
-	public void putAll(Map<? extends String, ? extends Object> m) {
-		for (Entry<? extends String, ? extends Object> e : m.entrySet()) {
+	public void putAll(Map<? extends String, ?> m) {
+		for (Entry<? extends String, ?> e : m.entrySet()) {
 			put(e.getKey(), e.getValue());
 		}
 	}
@@ -250,8 +250,19 @@ public class JSONObject implements Map<String, Object> {
 	 */
 	@Override
 	public String toString() {
+		return toString(false);
+	}
+	
+	/**
+	 * Returns a JSON string (RFC 4627) containing this object
+	 * 
+	 * @param compact create the compact version of this object
+	 * @return a JSON string compatible with RFC 4627
+	 */
+	public String toString(boolean compact) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (JSONOutputStream stream = new JSONOutputStream(baos)) {
+			stream.setCompact(compact);
 			stream.writeObject(this);
 		} catch (IOException e) {
 			return "Failed: " + e.getMessage();

@@ -10,7 +10,7 @@ targetCompatibility = 1.7
 
 def pluginGroup = "me.joshlarson"
 def pluginName = "fast-json"
-def pluginVersion = "2.0"
+def pluginVersion = "2.1"
 
 group = pluginGroup
 version = pluginVersion
@@ -34,6 +34,13 @@ dependencies {
 
 repositories {
 	jcenter()
+}
+
+jar {
+	baseName = "fast-json"
+	classifier = null
+	version = pluginVersion
+	from sourceSets.main.allSource
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

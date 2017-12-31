@@ -55,7 +55,7 @@ public class TestBasicObject {
 		Assert.assertEquals(12.34, (Double) out.get("decimal"), 1E-5);
 		Assert.assertEquals(0L, out.get("pos_infinity"));
 		Assert.assertEquals(0L, out.get("neg_infinity"));
-		Assert.assertEquals(0L, out.get("nan"));
+		Assert.assertEquals(0L, out.remove("nan"));
 	}
 	
 	@Test
