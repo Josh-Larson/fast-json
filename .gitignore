@@ -1,6 +1,7 @@
 bin/
 build/
 out/
+gen/
 
 .gradle/
 gradle/
