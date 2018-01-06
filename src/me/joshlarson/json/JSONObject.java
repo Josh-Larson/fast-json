@@ -100,6 +100,17 @@ public class JSONObject implements Map<String, Object> {
 		return attributes.put(key, value);
 	}
 	
+	public Object putLayered(String key, Object value) {
+		int dotIndex = key.indexOf('.');
+		if (dotIndex == -1)
+			return put(key, value);
+		String firstStr = key.substring(0, dotIndex);
+		JSONObject obj = getObject(firstStr);
+		if (obj == null)
+			put(firstStr, obj = new JSONObject());
+		return obj.putLayered(key.substring(dotIndex+1), value);
+	}
+	
 	@Override
 	public void putAll(Map<? extends String, ?> m) {
 		for (Entry<? extends String, ?> e : m.entrySet()) {
@@ -147,6 +158,14 @@ public class JSONObject implements Map<String, Object> {
 	 */
 	public Object get(String key) {
 		return attributes.get(Objects.requireNonNull(key, "key"));
+	}
+	
+	public Object getLayered(String key) {
+		int dotIndex = key.indexOf('.');
+		if (dotIndex == -1)
+			return get(key);
+		String firstStr = key.substring(0, dotIndex);
+		return getObject(firstStr).getLayered(key.substring(dotIndex+1));
 	}
 	
 	/**

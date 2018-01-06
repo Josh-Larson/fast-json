@@ -59,6 +59,26 @@ public class TestBasicObject {
 	}
 	
 	@Test
+	public void testLayered() throws IOException, JSONException {
+		JSONObject obj = new JSONObject();
+		JSONObject innerObj = new JSONObject();
+		innerObj.putLayered("test.test", "test");
+		
+		obj.putLayered("obj1.num1", 1234);
+		obj.putLayered("obj1.num2", 5678);
+		obj.putLayered("obj2.str1", "mystr1");
+		obj.putLayered("obj2.obj1", innerObj);
+		JSONObject out;
+		try (JSONInputStream in = new JSONInputStream(obj.toString())) {
+			out = in.readObject();
+		}
+		Assert.assertEquals(1234L, out.getLayered("obj1.num1"));
+		Assert.assertEquals(5678L, out.getLayered("obj1.num2"));
+		Assert.assertEquals("mystr1", out.getLayered("obj2.str1"));
+		Assert.assertEquals(innerObj, out.getLayered("obj2.obj1"));
+	}
+	
+	@Test
 	public void testBasicStrings() throws IOException, JSONException {
 		JSONObject obj = new JSONObject();
 		obj.put("no_punct", "NoPunctuation");
