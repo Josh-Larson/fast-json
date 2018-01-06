@@ -100,6 +100,14 @@ public class JSONObject implements Map<String, Object> {
 		return attributes.put(key, value);
 	}
 	
+	/**
+	 * Puts the value into this object using a layered syntax. For example: "data.username" looks for the "data" JSONObject, then puts the value for
+	 * the key "username". This is a recursive call, so it put to any depth.
+	 *
+	 * @param key the layered key
+	 * @param value the value to add
+	 * @return the previous value at that location, or null if none existed
+	 */
 	public Object putLayered(String key, Object value) {
 		int dotIndex = key.indexOf('.');
 		if (dotIndex == -1)
@@ -148,24 +156,26 @@ public class JSONObject implements Map<String, Object> {
 		return attributes.hashCode();
 	}
 	
-	/**
-	 * Gets the value associated with the specified key. The value will always be a supported JSON
-	 * object: JSONObject, JSONArray, Number, Boolean, String, or null
-	 * 
-	 * @param key the key for the map
-	 * @return the value associated with the specified key
-	 * @throws NullPointerException if the specified key is null
-	 */
 	public Object get(String key) {
 		return attributes.get(Objects.requireNonNull(key, "key"));
 	}
 	
+	/**
+	 * Gets the value from this object using a layered syntax. For example: "data.username" looks for the "data" JSONObject, then gets the value for
+	 * the key "username". This is a recursive call, so it get at any depth.
+	 *
+	 * @param key the layered key
+	 * @return the value at that location, or null if none exists
+	 */
 	public Object getLayered(String key) {
 		int dotIndex = key.indexOf('.');
 		if (dotIndex == -1)
 			return get(key);
 		String firstStr = key.substring(0, dotIndex);
-		return getObject(firstStr).getLayered(key.substring(dotIndex+1));
+		JSONObject obj = getObject(firstStr);
+		if (obj == null)
+			return null;
+		return obj.getLayered(key.substring(dotIndex+1));
 	}
 	
 	/**

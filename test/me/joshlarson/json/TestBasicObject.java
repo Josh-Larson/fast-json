@@ -76,6 +76,9 @@ public class TestBasicObject {
 		Assert.assertEquals(5678L, out.getLayered("obj1.num2"));
 		Assert.assertEquals("mystr1", out.getLayered("obj2.str1"));
 		Assert.assertEquals(innerObj, out.getLayered("obj2.obj1"));
+		Assert.assertEquals("test", out.getLayered("obj2.obj1.test.test"));
+		Assert.assertNull(out.getLayered("obj2.obj1.badkey.test"));
+		Assert.assertNull(out.getLayered("obj2.obj1.test.badkey"));
 	}
 	
 	@Test
