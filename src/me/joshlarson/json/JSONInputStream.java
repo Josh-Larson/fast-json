@@ -210,8 +210,31 @@ public class JSONInputStream extends InputStream {
 	private JSONArray getNextArrayInternal() throws IOException, JSONException {
 		JSONArray array = new JSONArray();
 		
+		Object o;
+		char c;
+		array_loop:
 		do {
-			array.add(getNextInternal());
+			c = ingestWhitespace();
+			switch (c) {
+				case '\"':
+					o = getNextTokenString();
+					break;
+				case '[':
+					o = getNextArrayInternal();
+					break;
+				case '{':
+					o = getNextObjectInternal();
+					break;
+				case ']':
+					break array_loop;
+				default:
+					strLength = 0;
+					stringAppend(c);
+					o = getNextTokenOther();
+					break;
+			}
+			
+			array.add(o);
 		} while (ingestSeparator(']'));
 		return array;
 	}

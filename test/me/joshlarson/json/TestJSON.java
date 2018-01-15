@@ -150,6 +150,11 @@ public class TestJSON {
 		Assert.assertNotNull(JSON.readObject("{}"));
 	}
 	
+	@Test
+	public void testArrayEmpty() throws JSONException, IOException {
+		Assert.assertNotNull(JSON.readArray("[]"));
+	}
+	
 	private ByteArrayInputStream wrap(String str) {
 		return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
 	}
