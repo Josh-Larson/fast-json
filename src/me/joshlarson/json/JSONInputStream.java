@@ -44,15 +44,6 @@ public class JSONInputStream extends InputStream {
 	private static final boolean [] WHITESPACE_MATCHERS = new boolean[256];
 	
 	static {
-		/*
-			case ' ':
-			case '\n':
-			case '\t':
-			case '\r':
-			case ',':
-			case ']':
-			case '}':
-		 */
 		STRING_SEPARATORS['\\'] = true;
 		STRING_SEPARATORS['\"'] = true;
 		
@@ -198,10 +189,15 @@ public class JSONInputStream extends InputStream {
 	private JSONObject getNextObjectInternal() throws IOException, JSONException {
 		JSONObject obj = new JSONObject();
 		
+		char c;
 		String key;
 		do {
-			if (ingestWhitespace() != '\"')
+			c = ingestWhitespace();
+			if (c != '\"') {
+				if (c == '}')
+					break;
 				throw new JSONException("Keys must start with \"!");
+			}
 			key = getNextTokenString();
 			if (ingestWhitespace() != ':')
 				throw new JSONException("Attributes must be key-value pairs separated by ':'");

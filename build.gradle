@@ -10,7 +10,7 @@ targetCompatibility = 1.7
 
 def pluginGroup = "me.joshlarson"
 def pluginName = "fast-json"
-def pluginVersion = "2.2.1"
+def pluginVersion = "2.2.2"
 
 group = pluginGroup
 version = pluginVersion
@@ -119,9 +119,9 @@ bintray {
 		vcsUrl = 'https://github.com/Josh-Larson/fast-json.git'
 		version {
 			name = pluginVersion
-			desc = 'Fast JSON version 2.2.1'
+			desc = 'Fast JSON version 2.2.2'
 			released = new Date()
-			vcsTag = 'v2.2.1'
+			vcsTag = 'v2.2.2'
 		}
 	}
 }
