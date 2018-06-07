@@ -144,9 +144,23 @@ public class TestBasicObject {
 		Assert.assertEquals((long) 123E15, obj.getLong("long"));
 		Assert.assertEquals(12.3f, obj.getFloat("float"), 1E-5);
 		Assert.assertEquals(12.3, obj.getDouble("double"), 1E-5);
-		Assert.assertEquals(true, obj.getBoolean("bool"));
+		Assert.assertTrue(obj.getBoolean("bool"));
 		Assert.assertEquals("testing", obj.getString("str"));
 		Assert.assertNull(obj.get("null"));
+	}
+	
+	@Test
+	public void testAdvancedNumbers() throws IOException, JSONException {
+		JSONObject objPlus = JSON.readObject("{\"testZero\": 0E+0, \"testOne\": 1E+0, \"testTen\": 1E+1}");
+		JSONObject objStandard = JSON.readObject("{\"testZero\": 0E0, \"testOne\": 1E0, \"testTen\": 1E1}");
+		
+		Assert.assertEquals(0, objPlus.getDouble("testZero"), 1E-10);
+		Assert.assertEquals(1, objPlus.getDouble("testOne"), 1E-10);
+		Assert.assertEquals(10, objPlus.getDouble("testTen"), 1E-10);
+		
+		Assert.assertEquals(0, objStandard.getDouble("testZero"), 1E-10);
+		Assert.assertEquals(1, objStandard.getDouble("testOne"), 1E-10);
+		Assert.assertEquals(10, objStandard.getDouble("testTen"), 1E-10);
 	}
 	
 	private void testString(JSONObject expected, JSONObject actual, String key) {

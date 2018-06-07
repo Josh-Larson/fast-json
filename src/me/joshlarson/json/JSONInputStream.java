@@ -349,6 +349,8 @@ public class JSONInputStream extends InputStream {
 		for (int i = 0; i < len; i++) {
 			switch (strData[i]) {
 				case '.':
+				case 'E':
+				case 'e':
 					decimal = true;
 				case '0':
 				case '1':
@@ -362,8 +364,6 @@ public class JSONInputStream extends InputStream {
 				case '9':
 				case '-':
 				case '+':
-				case 'E':
-				case 'e':
 					break;
 				default:
 					if (stringEquals("null"))

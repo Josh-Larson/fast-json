@@ -114,8 +114,8 @@ public class TestJSON {
 		Assert.assertNotNull(array);
 		Assert.assertEquals("val1", array.getString(0));
 		Assert.assertNull(array.get(1));
-		Assert.assertEquals(false, array.getBoolean(2));
-		Assert.assertEquals(true, array.getBoolean(3));
+		Assert.assertFalse(array.getBoolean(2));
+		Assert.assertTrue(array.getBoolean(3));
 		Assert.assertEquals(1.5, array.getDouble(4), 1E-7);
 		Assert.assertEquals(2, array.getLong(5));
 	}
