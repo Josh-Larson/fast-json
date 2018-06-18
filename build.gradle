@@ -10,7 +10,7 @@ targetCompatibility = 1.7
 
 def pluginGroup = "me.joshlarson"
 def pluginName = "fast-json"
-def pluginVersion = "2.2.5"
+def pluginVersion = "2.2.6"
 
 group = pluginGroup
 version = pluginVersion
