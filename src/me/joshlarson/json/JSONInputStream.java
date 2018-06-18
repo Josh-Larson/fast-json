@@ -315,7 +315,7 @@ public class JSONInputStream extends InputStream {
 			if (size < min)
 				min = size;
 			while (pos < min) {
-				c = buf[pos];
+				c = buf[pos] & 0xFF;
 				if (!TOKEN_MATCHERS[c]) {
 					str[strLen++] = (char) c;
 					pos++;
