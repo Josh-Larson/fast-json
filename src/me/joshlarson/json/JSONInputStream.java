@@ -30,6 +30,11 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * This input stream will read RFC 4627 compatible JSON strings from either a string or an input
@@ -38,6 +43,9 @@ import java.nio.charset.StandardCharsets;
  * @author josh
  */
 public class JSONInputStream extends InputStream {
+	
+	private static final Supplier<Map<String, Object>> DEFAULT_OBJECT_SUPPLIER = LinkedHashMap::new;
+	private static final Supplier<List<Object>> DEFAULT_ARRAY_SUPPLIER = ArrayList::new;
 	
 	private static final boolean [] STRING_SEPARATORS = new boolean[256];
 	private static final boolean [] TOKEN_MATCHERS = new boolean[256];
@@ -57,6 +65,9 @@ public class JSONInputStream extends InputStream {
 		TOKEN_MATCHERS[']'] = true;
 		TOKEN_MATCHERS['}'] = true;
 	}
+	
+	private final Supplier<Map<String, Object>> objectSupplier;
+	private final Supplier<List<Object>> arraySupplier;
 	
 	private final InputStream is;
 	private final byte[] buffer;
@@ -78,13 +89,38 @@ public class JSONInputStream extends InputStream {
 	}
 	
 	/**
+	 * Creates a new input stream around the specified string
+	 *
+	 * @param str            a RFC 4627 JSON string
+	 * @param objectSupplier a supplier for JSON object implementations
+	 * @param arraySupplier  a supplier for JSON array implementations
+	 */
+	public JSONInputStream(String str, Supplier<Map<String, Object>> objectSupplier, Supplier<List<Object>> arraySupplier) {
+		this(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)), objectSupplier, arraySupplier);
+	}
+	
+	/**
 	 * Creates a new input stream around the specified input stream
 	 *
 	 * @param is the input stream pointing to the RFC 4627 JSON string
 	 */
 	public JSONInputStream(InputStream is) {
+		this(is, DEFAULT_OBJECT_SUPPLIER, DEFAULT_ARRAY_SUPPLIER);
+	}
+	
+	/**
+	 * Creates a new input stream around the specified input stream
+	 *
+	 * @param is             the input stream pointing to the RFC 4627 JSON string
+	 * @param objectSupplier a supplier for JSON object implementations
+	 * @param arraySupplier  a supplier for JSON array implementations
+	 */
+	public JSONInputStream(InputStream is, Supplier<Map<String, Object>> objectSupplier, Supplier<List<Object>> arraySupplier) {
+		this.objectSupplier = objectSupplier;
+		this.arraySupplier = arraySupplier;
+		
 		this.is = is;
-		this.buffer = new byte[1024*4];
+		this.buffer = new byte[1024 * 4];
 		this.bufferPos = 0;
 		this.bufferSize = 0;
 		
@@ -94,9 +130,9 @@ public class JSONInputStream extends InputStream {
 	}
 	
 	/**
-	 * Reads a JSONObject or a JSONArray from the stream
+	 * Reads a Map or a List from the stream
 	 * 
-	 * @return the read JSONObject/JSONArray or null if it's the end of the stream
+	 * @return the read Map/List or null if it's the end of the stream
 	 * @throws IOException   if there is an exception within the input stream
 	 * @throws JSONException if there is a JSON parsing error
 	 */
@@ -118,16 +154,16 @@ public class JSONInputStream extends InputStream {
 	}
 	
 	/**
-	 * Reads a JSONObject from the stream
+	 * Reads a Map from the stream
 	 *
-	 * @return the read JSONObject, or null if it's the end of the stream
+	 * @return the read Map, or null if it's the end of the stream
 	 * @throws IOException   if there is an exception within the input stream
 	 * @throws JSONException if there is a JSON parsing error
 	 */
-	public JSONObject readObject() throws IOException, JSONException {
+	public Map<String, Object> readObject() throws IOException, JSONException {
 		try {
 			if (ingestWhitespace() != '{')
-				throw new JSONException("JSONObject must start with '{'");
+				throw new JSONException("JSON object must start with '{'");
 		} catch (EOFException e) {
 			return null;
 		}
@@ -135,16 +171,16 @@ public class JSONInputStream extends InputStream {
 	}
 	
 	/**
-	 * Reads a JSONArray from the stream
+	 * Reads a List from the stream
 	 *
-	 * @return the read JSONArray or null if it's the end of the stream
+	 * @return the read List or null if it's the end of the stream
 	 * @throws IOException   if there is an exception within the input stream
 	 * @throws JSONException if there is a JSON parsing error
 	 */
-	public JSONArray readArray() throws IOException, JSONException {
+	public List<Object> readArray() throws IOException, JSONException {
 		try {
 			if (ingestWhitespace() != '[')
-				throw new JSONException("JSONArray must start with '['");
+				throw new JSONException("JSON array must start with '['");
 		} catch (EOFException e) {
 			return null;
 		}
@@ -186,8 +222,8 @@ public class JSONInputStream extends InputStream {
 		is.reset();
 	}
 	
-	private JSONObject getNextObjectInternal() throws IOException, JSONException {
-		JSONObject obj = new JSONObject();
+	private Map<String, Object> getNextObjectInternal() throws IOException, JSONException {
+		Map<String, Object> obj = objectSupplier.get();
 		
 		char c;
 		String key;
@@ -207,8 +243,8 @@ public class JSONInputStream extends InputStream {
 		return obj;
 	}
 	
-	private JSONArray getNextArrayInternal() throws IOException, JSONException {
-		JSONArray array = new JSONArray();
+	private List<Object> getNextArrayInternal() throws IOException, JSONException {
+		List<Object> array = arraySupplier.get();
 		
 		Object o;
 		char c;

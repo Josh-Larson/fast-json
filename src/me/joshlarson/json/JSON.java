@@ -79,7 +79,7 @@ public class JSON {
 	 */
 	public static JSONObject readObject(InputStream is, boolean printError) {
 		try (JSONInputStream in = new JSONInputStream(is)) {
-			return in.readObject();
+			return new JSONObject(in.readObject());
 		} catch (IOException | JSONException e) {
 			if (printError)
 				e.printStackTrace();
@@ -96,7 +96,7 @@ public class JSON {
 	 */
 	public static JSONObject readObject(String str, boolean printError) {
 		try (JSONInputStream in = new JSONInputStream(str)) {
-			return in.readObject();
+			return new JSONObject(in.readObject());
 		} catch (IOException | JSONException e) {
 			if (printError)
 				e.printStackTrace();
@@ -113,7 +113,7 @@ public class JSON {
 	 */
 	public static JSONArray readArray(InputStream is, boolean printError) {
 		try (JSONInputStream in = new JSONInputStream(is)) {
-			return in.readArray();
+			return new JSONArray(in.readArray());
 		} catch (IOException | JSONException e) {
 			if (printError)
 				e.printStackTrace();
@@ -130,7 +130,7 @@ public class JSON {
 	 */
 	public static JSONArray readArray(String str, boolean printError) {
 		try (JSONInputStream in = new JSONInputStream(str)) {
-			return in.readArray();
+			return new JSONArray(in.readArray());
 		} catch (IOException | JSONException e) {
 			if (printError)
 				e.printStackTrace();
@@ -176,7 +176,7 @@ public class JSON {
 	 */
 	public static JSONObject readObject(InputStream is) throws IOException, JSONException {
 		try (JSONInputStream in = new JSONInputStream(is)) {
-			return in.readObject();
+			return new JSONObject(in.readObject());
 		}
 	}
 	
@@ -190,7 +190,7 @@ public class JSON {
 	 */
 	public static JSONObject readObject(String str) throws IOException, JSONException {
 		try (JSONInputStream in = new JSONInputStream(str)) {
-			return in.readObject();
+			return new JSONObject(in.readObject());
 		}
 	}
 	
@@ -204,7 +204,7 @@ public class JSON {
 	 */
 	public static JSONArray readArray(InputStream is) throws IOException, JSONException {
 		try (JSONInputStream in = new JSONInputStream(is)) {
-			return in.readArray();
+			return new JSONArray(in.readArray());
 		}
 	}
 	
@@ -218,7 +218,7 @@ public class JSON {
 	 */
 	public static JSONArray readArray(String str) throws IOException, JSONException {
 		try (JSONInputStream in = new JSONInputStream(str)) {
-			return in.readArray();
+			return new JSONArray(in.readArray());
 		}
 	}
 	

@@ -31,7 +31,7 @@ import java.util.*;
 
 /**
  * This class contains key-value pairs where the key is a string and the value is one of the
- * following types: JSONObject, JSONArray, Number, Boolean, String, or null
+ * following types: Map, List, Number, Boolean, String, or null
  * 
  * @author josh
  */
@@ -40,7 +40,7 @@ public class JSONObject implements Map<String, Object> {
 	private final Map<String, Object> attributes;
 	
 	public JSONObject() {
-		this(new HashMap<String, Object>());
+		this(new HashMap<>());
 	}
 	
 	public JSONObject(Map<String, Object> map) {
@@ -101,8 +101,8 @@ public class JSONObject implements Map<String, Object> {
 	}
 	
 	/**
-	 * Puts the value into this object using a layered syntax. For example: "data.username" looks for the "data" JSONObject, then puts the value for
-	 * the key "username". This is a recursive call, so it put to any depth.
+	 * Puts the value into this object using a layered syntax. For example: "data.username" looks for the "data" Map, then puts the value for
+	 * the key "username". This is a recursive call, so it puts to any depth.
 	 *
 	 * @param key the layered key
 	 * @param value the value to add
@@ -113,10 +113,10 @@ public class JSONObject implements Map<String, Object> {
 		if (dotIndex == -1)
 			return put(key, value);
 		String firstStr = key.substring(0, dotIndex);
-		JSONObject obj = getObject(firstStr);
+		Map<String, Object> obj = getObject(firstStr);
 		if (obj == null)
-			put(firstStr, obj = new JSONObject());
-		return obj.putLayered(key.substring(dotIndex+1), value);
+			put(firstStr, obj = new HashMap<>());
+		return new JSONObject(obj).putLayered(key.substring(dotIndex+1), value);
 	}
 	
 	@Override
@@ -161,7 +161,7 @@ public class JSONObject implements Map<String, Object> {
 	}
 	
 	/**
-	 * Gets the value from this object using a layered syntax. For example: "data.username" looks for the "data" JSONObject, then gets the value for
+	 * Gets the value from this object using a layered syntax. For example: "data.username" looks for the "data" Map, then gets the value for
 	 * the key "username". This is a recursive call, so it get at any depth.
 	 *
 	 * @param key the layered key
@@ -172,36 +172,38 @@ public class JSONObject implements Map<String, Object> {
 		if (dotIndex == -1)
 			return get(key);
 		String firstStr = key.substring(0, dotIndex);
-		JSONObject obj = getObject(firstStr);
+		Map<String, Object> obj = getObject(firstStr);
 		if (obj == null)
 			return null;
-		return obj.getLayered(key.substring(dotIndex+1));
+		return new JSONObject(obj).getLayered(key.substring(dotIndex+1));
 	}
 	
 	/**
-	 * Gets the value associated with the specified key. The value is casted to a JSONObject
+	 * Gets the value associated with the specified key. The value is casted to a Map
 	 * internally
 	 * 
 	 * @param key the key for the map
-	 * @return the JSONObject associated with the specified key
+	 * @return the Map associated with the specified key
 	 * @throws NullPointerException if the specified key is null
-	 * @throws ClassCastException if the object is not a JSONObject
+	 * @throws ClassCastException if the object is not a Map
 	 */
-	public JSONObject getObject(String key) {
-		return (JSONObject) get(key);
+	@SuppressWarnings("unchecked") // caller's responsibility
+	public Map<String, Object> getObject(String key) {
+		return (Map<String, Object>) get(key);
 	}
 	
 	/**
-	 * Gets the value associated with the specified key. The value is casted to a JSONArray
+	 * Gets the value associated with the specified key. The value is casted to a List
 	 * internally
 	 * 
 	 * @param key the key for the map
-	 * @return the JSONArray associated with the specified key
+	 * @return the List associated with the specified key
 	 * @throws NullPointerException if the specified key is null
-	 * @throws ClassCastException if the object is not a JSONArray
+	 * @throws ClassCastException if the object is not a List
 	 */
-	public JSONArray getArray(String key) {
-		return (JSONArray) get(key);
+	@SuppressWarnings("unchecked") // caller's responsibility
+	public List<Object> getArray(String key) {
+		return (List<Object>) get(key);
 	}
 	
 	/**

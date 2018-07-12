@@ -34,6 +34,8 @@ import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 @RunWith(JUnit4.class)
 public class TestJSON {
@@ -80,44 +82,43 @@ public class TestJSON {
 	@Test
 	public void testUnicodeRead() throws JSONException, IOException {
 		String str = "{\"key1\":\"\\u0041\"}";
-		JSONObject obj = JSON.readObject(str);
+		Map<String, Object> obj = JSON.readObject(str);
 		Assert.assertNotNull(obj);
 		Assert.assertEquals("A", obj.get("key1"));
 	}
 	
 	@Test
 	public void testReadObjectString() throws JSONException, IOException {
-		JSONObject obj;
 		String str;
 		str = "{\"key1\":\"value1\",\"key2\":2}";
-		obj = JSON.readObject(str);
+		Map<String, Object> obj = JSON.readObject(str);
 		Assert.assertNotNull(obj);
-		Assert.assertEquals("value1", obj.getString("key1"));
-		Assert.assertEquals(2, obj.getInt("key2"));
+		Assert.assertEquals("value1", obj.get("key1"));
+		Assert.assertEquals(2, (long) obj.get("key2"));
 	}
 	
 	@Test
 	public void testReadArrayString() throws JSONException, IOException {
-		JSONArray array;
+		List<Object> array;
 		String str;
 		
 		str = "[\"key1\",\"value1\",1.5,2]";
 		array = JSON.readArray(str);
 		Assert.assertNotNull(array);
-		Assert.assertEquals("key1", array.getString(0));
-		Assert.assertEquals("value1", array.getString(1));
-		Assert.assertEquals(1.5, array.getDouble(2), 1E-7);
-		Assert.assertEquals(2, array.getLong(3));
+		Assert.assertEquals("key1", array.get(0));
+		Assert.assertEquals("value1", array.get(1));
+		Assert.assertEquals(1.5, (double) array.get(2), 1E-7);
+		Assert.assertEquals(2, (long) array.get(3));
 		
 		str = "[\"val1\",null,false,true,1.5,2]";
 		array = JSON.readArray(wrap(str));
 		Assert.assertNotNull(array);
-		Assert.assertEquals("val1", array.getString(0));
+		Assert.assertEquals("val1", array.get(0));
 		Assert.assertNull(array.get(1));
-		Assert.assertFalse(array.getBoolean(2));
-		Assert.assertTrue(array.getBoolean(3));
-		Assert.assertEquals(1.5, array.getDouble(4), 1E-7);
-		Assert.assertEquals(2, array.getLong(5));
+		Assert.assertFalse((boolean) array.get(2));
+		Assert.assertTrue((boolean) array.get(3));
+		Assert.assertEquals(1.5, (double) array.get(4), 1E-7);
+		Assert.assertEquals(2, (long) array.get(5));
 	}
 	
 	@Test(expected=EOFException.class)

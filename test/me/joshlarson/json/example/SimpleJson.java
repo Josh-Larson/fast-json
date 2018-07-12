@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import me.joshlarson.json.JSONArray;
@@ -57,7 +58,7 @@ public class SimpleJson {
 		String json = obj.toString();
 		try (JSONInputStream reader = new JSONInputStream(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)))) {
 			start = System.nanoTime();
-			JSONObject readObj = reader.readObject();
+			Map<String, Object> readObj = reader.readObject();
 			end = System.nanoTime();
 			for (Entry<String, Object> e : readObj.entrySet()) {
 				System.out.println(e.getKey() + ": " + e.getValue());

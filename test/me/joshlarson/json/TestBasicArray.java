@@ -48,13 +48,13 @@ public class TestBasicArray {
 		Assert.assertEquals(7, array.size());
 		JSONArray out;
 		try (JSONInputStream in = new JSONInputStream(array.toString())) {
-			out = in.readArray();
+			out = new JSONArray(in.readArray());
 		}
 		Assert.assertEquals(7, out.size());
 		Assert.assertEquals(1234L, out.get(0));
 		Assert.assertEquals((-1234L), out.get(1));
-		Assert.assertEquals((Double) 10E10, (Double) out.get(2), 1E-5);
-		Assert.assertEquals((Double) 12.34, (Double) out.get(3), 1E-5);
+		Assert.assertEquals(10E10, (Double) out.get(2), 1E-5);
+		Assert.assertEquals(12.34, (Double) out.get(3), 1E-5);
 		Assert.assertEquals(0L, out.get(4));
 		Assert.assertEquals(0L, out.get(5));
 		Assert.assertEquals(0L, out.get(6));
@@ -72,7 +72,7 @@ public class TestBasicArray {
 		Assert.assertEquals(4, array.size());
 		Assert.assertTrue("String must be entirely ascii", isAscii(str));
 		try (JSONInputStream in = new JSONInputStream(str)) {
-			out = in.readArray();
+			out = new JSONArray(in.readArray());
 		}
 		Assert.assertEquals(4, out.size());
 		for (int i = 0; i < 4; i++)

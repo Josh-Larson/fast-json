@@ -27,24 +27,24 @@ package me.joshlarson.json;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
- * This class contains a list of values, which can be one of the following types: JSONObject,
- * JSONArray, Number, Boolean, String, or null
+ * This class contains a list of values, which can be one of the following types: Map,
+ * List, Number, Boolean, String, or null
  * 
  * @author josh
  */
 public class JSONArray implements List<Object>, Iterable<Object> {
 	
-	private final ArrayList<Object> array; // Specifically ArrayList for null value support
+	private final List<Object> array;
 	
 	public JSONArray() {
-		array = new ArrayList<>();
+		this.array = new ArrayList<>(); // Specifically ArrayList for null value support
+	}
+	
+	public JSONArray(List<Object> array) {
+		this.array = array;
 	}
 	
 	@Override
@@ -149,7 +149,7 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	
 	/**
 	 * Gets the object at the specified index from the array. The returned object will always be one
-	 * of the supported JSON types: JSONObject, JSONArray, Number, Boolean, String, or null
+	 * of the supported JSON types: Map, List, Number, Boolean, String, or null
 	 * 
 	 * @param index the index to retrieve over the interval [0, size())
 	 * @return the object at the specified index
@@ -161,26 +161,28 @@ public class JSONArray implements List<Object>, Iterable<Object> {
 	
 	/**
 	 * Gets the object at the specified index from the array. The returned object is casted to a
-	 * JSONObject
+	 * Map
 	 * 
 	 * @param index the index to retrieve over the interval [0, size())
 	 * @return the object at the specified index
-	 * @throws ClassCastException if the object is not a JSONObject
+	 * @throws ClassCastException if the object is not a Map
 	 */
-	public JSONObject getObject(int index) {
-		return (JSONObject) get(index);
+	@SuppressWarnings("unchecked") // caller's responsibility
+	public Map<String, Object> getObject(int index) {
+		return (Map<String, Object>) get(index);
 	}
 	
 	/**
 	 * Gets the object at the specified index from the array. The returned object is casted to a
-	 * JSONArray
+	 * List
 	 * 
 	 * @param index the index to retrieve over the interval [0, size())
 	 * @return the array at the specified index
-	 * @throws ClassCastException if the object is not a JSONArray
+	 * @throws ClassCastException if the object is not a List
 	 */
-	public JSONArray getArray(int index) {
-		return (JSONArray) get(index);
+	@SuppressWarnings("unchecked") // caller's responsibility
+	public List<Object> getArray(int index) {
+		return (List<Object>) get(index);
 	}
 	
 	/**

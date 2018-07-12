@@ -47,7 +47,7 @@ public class TestBasicObject {
 		obj.put("nan", Double.NaN);
 		JSONObject out;
 		try (JSONInputStream in = new JSONInputStream(obj.toString())) {
-			out = in.readObject();
+			out = new JSONObject(in.readObject());
 		}
 		Assert.assertEquals(1234L, out.get("positive"));
 		Assert.assertEquals((-1234L), out.get("negative"));
@@ -70,7 +70,7 @@ public class TestBasicObject {
 		obj.putLayered("obj2.obj1", innerObj);
 		JSONObject out;
 		try (JSONInputStream in = new JSONInputStream(obj.toString())) {
-			out = in.readObject();
+			out = new JSONObject(in.readObject());
 		}
 		Assert.assertEquals(1234L, out.getLayered("obj1.num1"));
 		Assert.assertEquals(5678L, out.getLayered("obj1.num2"));
@@ -92,7 +92,7 @@ public class TestBasicObject {
 		String str = obj.toString();
 		Assert.assertTrue("String must be entirely ascii", isAscii(str));
 		try (JSONInputStream in = new JSONInputStream(str)) {
-			out = in.readObject();
+			out = new JSONObject(in.readObject());
 		}
 		testString(obj, out, "no_punct");
 		testString(obj, out, "punct");

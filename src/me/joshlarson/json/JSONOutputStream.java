@@ -28,6 +28,8 @@ package me.joshlarson.json;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -72,26 +74,26 @@ public class JSONOutputStream extends OutputStream {
 	}
 	
 	/**
-	 * Writes the specified JSONObject to the output stream
+	 * Writes the specified Map to the output stream
 	 * 
-	 * @param obj the JSONObject to write
+	 * @param obj the Map to write
 	 * @throws IOException if there is an I/O error
 	 */
-	public void writeObject(JSONObject obj) throws IOException {
+	public void writeObject(Map<String, Object> obj) throws IOException {
 		writeObject(obj, 0);
 	}
 	
 	/**
-	 * Writes the specified JSONArray to the output stream
+	 * Writes the specified List to the output stream
 	 * 
-	 * @param array the JSONArray to write
+	 * @param array the List to write
 	 * @throws IOException if there is an I/O error
 	 */
-	public void writeArray(JSONArray array) throws IOException {
+	public void writeArray(List<Object> array) throws IOException {
 		writeArray(array, 0);
 	}
 	
-	private void writeObject(JSONObject obj, int depth) throws IOException {
+	private void writeObject(Map<String, Object> obj, int depth) throws IOException {
 		write('{');
 		if (!compact)
 			write('\n');
@@ -116,7 +118,7 @@ public class JSONOutputStream extends OutputStream {
 		write('}');
 	}
 	
-	private void writeArray(JSONArray array, int depth) throws IOException {
+	private void writeArray(List<Object> array, int depth) throws IOException {
 		write('[');
 		if (!compact)
 			write('\n');
@@ -135,6 +137,7 @@ public class JSONOutputStream extends OutputStream {
 		write(']');
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void writeValue(Object o, int depth) throws IOException {
 		if (o instanceof String)					// String
 			writeStringSafe("\"" + escapeString((String) o) + "\"");
@@ -144,10 +147,10 @@ public class JSONOutputStream extends OutputStream {
 			writeString(o.toString());
 		else if (o == null)							// Null
 			writeString("null");
-		else if (o instanceof JSONObject)			// Object
-			writeObject(((JSONObject) o), depth);
-		else if (o instanceof JSONArray)			// Array
-			writeArray(((JSONArray) o), depth);
+		else if (o instanceof Map)					// Object
+			writeObject(((Map<String, Object>) o), depth);
+		else if (o instanceof List)					// Array
+			writeArray(((List<Object>) o), depth);
 		else										// Invalid
 			throw new IllegalArgumentException("Invalid class written to JSONOutputStream: " + o);
 	}

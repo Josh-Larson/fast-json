@@ -28,6 +28,7 @@ package me.joshlarson.json.example;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Map;
 import java.util.Random;
 
 import me.joshlarson.json.JSONException;
@@ -40,7 +41,7 @@ public class BigFileTest {
 	public static void main(String [] args) throws IOException, JSONException, InterruptedException {
 		byte [] bigArrayData = Files.readAllBytes(new File("testdata/json-bigarray.json").toPath());
 		byte [] bigStringData = Files.readAllBytes(new File("testdata/json-bigstring.json").toPath());
-		JSONObject obj;
+		Map<String, Object> obj;
 		long start, end;
 		
 		System.out.println("Running...");
@@ -63,15 +64,15 @@ public class BigFileTest {
 		System.out.printf("Output-bigstring: %.6fms%n", (end-start)/1E6);
 	}
 	
-	private static void testOutputSpeed(JSONObject obj) throws IOException {
+	private static void testOutputSpeed(Map<String, Object> obj) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try (JSONOutputStream out = new JSONOutputStream(baos)) {
 			out.writeObject(obj);
 		}
 	}
 	
-	private static JSONObject testInputSpeed(byte [] data) throws IOException, JSONException {
-		JSONObject obj = null;
+	private static Map<String, Object> testInputSpeed(byte [] data) throws IOException, JSONException {
+		Map<String, Object> obj = null;
 		for (int i = 0; i < 10; ++i) {
 			try (JSONInputStream in = new JSONInputStream(new ByteArrayInputStream(data))) {
 				obj = in.readObject();
